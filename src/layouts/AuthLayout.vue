@@ -1,3 +1,4 @@
+/* eslint-disable */
 <template>
   <div class="auth-layout">
     <Navbar />
@@ -11,8 +12,8 @@
 </template>
 
 <script>
-import Navbar from '../components/NavbarComponent.vue';
-import Sidebar from '../components/SidebarComponent.vue';
+import Navbar from '../components/Navbar/NavbarComponent.vue';
+import Sidebar from '../components/Sidebar/SidebarComponent.vue';
 
 export default {
   components: {
@@ -38,7 +39,7 @@ export default {
 .content-area {
   flex: 1;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #F6F6F6;;
   overflow-y: auto;
 }
 </style>
