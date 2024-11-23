@@ -7,18 +7,19 @@ import store from '../store';
 import Settings from '@/views/SettingsPage.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import LocationPage from '@/views/LocationPage.vue';
+import DriversPage from '@/views/DriversPage.vue';
 
 const routes = [
     {
         path: '/',
         name: 'Home',
         beforeEnter: (to, from, next) => {
-            const isAuthenticated = store.state.auth.token !== null;
-            if (isAuthenticated) {
-                next('/dashboard');
-            } else {
-                next('/login');
-            }
+            // const isAuthenticated = store.state.auth.token !== null;
+            // if (isAuthenticated) {
+            next('/dashboard');
+            // } else {
+            //     next('/login');
+            // }
         },
     },
     {
@@ -36,7 +37,7 @@ const routes = [
     {
         path: '/dashboard',
         component: AuthLayout,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: false },
         children: [
             {
                 path: '',
@@ -52,6 +53,11 @@ const routes = [
                 path: '/location',
                 name: 'Location',
                 component: LocationPage,
+            },
+            {
+                path: '/drivers',
+                name: 'Drivers',
+                component: DriversPage,
             }
         ],
     },
