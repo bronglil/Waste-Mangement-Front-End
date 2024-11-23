@@ -75,7 +75,7 @@ export default {
 }
 
 .sidebar-top-line {
-  height: 3px;
+  height: 2px;
   background-color: #4a90e2;
 }
 
