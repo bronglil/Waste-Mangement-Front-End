@@ -4,10 +4,11 @@ import Login from '../views/LoginPage.vue';
 import Signup from '../views/SignupPage.vue';
 import Dashboard from '../views/DashboardPage.vue';
 import store from '../store';
-import Settings from '@/views/SettingsPage.vue';
-import AuthLayout from '@/layouts/AuthLayout.vue';
-import LocationPage from '@/views/LocationPage.vue';
-import DriversPage from '@/views/DriversPage.vue';
+import Settings from '../views/SettingsPage.vue';
+import AuthLayout from '../layouts/AuthLayout.vue';
+import LocationPage from '../views/LocationPage.vue';
+import DriversPage from '../views/DriversPage.vue';
+import BinPage from '../views/BinPage.vue';
 
 const routes = [
     {
@@ -58,7 +59,22 @@ const routes = [
                 path: '/drivers',
                 name: 'Drivers',
                 component: DriversPage,
-            }
+            },
+            {
+                path: '/vehicles',
+                name: 'Vehicles',
+                component: DriversPage,
+            },
+            {
+                path: '/notifications',
+                name: 'Notifications',
+                component: DriversPage,
+            },
+            {
+                path: '/bins',
+                name: 'Bins',
+                component: BinPage,
+            },
         ],
     },
 
