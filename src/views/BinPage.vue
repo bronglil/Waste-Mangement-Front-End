@@ -1,36 +1,36 @@
 <template>
     <div class="min-h-screen p-6 card">
-        <div class="flex items-center justify-between w-100 mx-auto space-x-2 p-4 bg-white shadow-md rounded-md">
+        <div class="flex justify-between items-center p-4 bg-white shadow-md rounded-md">
             <div class="flex items-center space-x-2">
                 <Icon :icon="'mdi:trash-can'" class="w-6 h-6 text-gray-800 dark:text-gray-600" />
                 <h4 class="text-lg font-medium text-gray-800 dark:text-black">Bin Management</h4>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Add Bin</span>
+                <button @click="openAddBinModal"
+                    class="w-8 h-8 flex items-center justify-center text-blue-500 hover:text-blue-700 rounded-full bg-blue-100 hover:bg-blue-200 focus:outline-none"
+                    title="Add">
+                    <Icon :icon="'mdi:add'" class="w-5 h-5" />
+                </button>
             </div>
         </div>
 
         <ReusableTable :headers="['Location', 'Status', 'Actions']" :data="filteredBins"
             :fields="['location', 'status', 'actions']">
-            <!-- Location Slot -->
             <template #location="{ value }">
-                <div class="text-base font-medium text-gray-900 dark:text-white">
-                    {{ value }}
-                </div>
+                <div class="text-base font-medium text-gray-900 dark:text-white">{{ value }}</div>
             </template>
 
-            <!-- Status Slot -->
             <template #status="{ row }">
-                <div class="flex">
-                    <div :class="{
-                        'bg-green-100 text-green-700': row.status === 'Empty',
-                        'bg-yellow-100 text-yellow-700': row.status === 'In Progress',
-                        'bg-red-100 text-red-700': row.status === 'Full',
-                    }" class="px-3 py-1 text-sm font-medium rounded-full shadow-sm"
-                        style="min-width: 80px; text-align: center;">
-                        {{ row.status }}
-                    </div>
+                <div :class="{
+                    'bg-green-100 text-green-700': row.status === 'Empty',
+                    'bg-yellow-100 text-yellow-700': row.status === 'In Progress',
+                    'bg-red-100 text-red-700': row.status === 'Full',
+                }" class="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-full shadow-sm">
+                    {{ row.status }}
                 </div>
             </template>
 
-            <!-- Actions Slot -->
             <template #actions="{ row }">
                 <div class="flex space-x-2">
                     <button @click="openEditBinModal(row)"
@@ -47,7 +47,6 @@
             </template>
         </ReusableTable>
 
-        <!-- Edit Bin Modal -->
         <EditBinModal v-if="showEditBinModal" :initial-data="currentBin" @save="saveBinChanges"
             @close="closeEditBinModal" />
     </div>
@@ -73,8 +72,13 @@ export default {
 
         const filteredBins = computed(() => bins.value);
 
+        const openAddBinModal = () => {
+            currentBin.value = null; // Clear data for adding a new bin
+            showEditBinModal.value = true;
+        };
+
         const openEditBinModal = (bin) => {
-            currentBin.value = { ...bin };
+            currentBin.value = { ...bin }; // Populate data for editing
             showEditBinModal.value = true;
         };
 
@@ -83,9 +87,18 @@ export default {
         };
 
         const saveBinChanges = (updatedData) => {
-            const binIndex = bins.value.findIndex((bin) => bin.id === currentBin.value.id);
-            if (binIndex !== -1) {
-                bins.value[binIndex] = { ...updatedData };
+            if (currentBin.value) {
+                // Update existing bin
+                const binIndex = bins.value.findIndex((bin) => bin.id === currentBin.value.id);
+                if (binIndex !== -1) {
+                    bins.value[binIndex] = { ...currentBin.value, ...updatedData };
+                }
+            } else {
+                // Add new bin
+                bins.value.push({
+                    ...updatedData,
+                    id: bins.value.length + 1, // Generate unique ID
+                });
             }
             closeEditBinModal();
         };
@@ -99,6 +112,7 @@ export default {
             filteredBins,
             showEditBinModal,
             currentBin,
+            openAddBinModal,
             openEditBinModal,
             closeEditBinModal,
             saveBinChanges,
@@ -107,22 +121,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-.card {
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-button {
-    transition: transform 0.2s ease-in-out, background 0.3s ease;
-}
-
-button:hover {
-    transform: scale(1.05);
-}
-
-button:focus {
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
-}
-</style>

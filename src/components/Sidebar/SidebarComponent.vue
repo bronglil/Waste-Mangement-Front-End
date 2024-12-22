@@ -1,7 +1,9 @@
 <template>
   <aside :class="['sidebar', { collapsed }]">
+    <!-- Top Line -->
     <div class="sidebar-top-line"></div>
 
+    <!-- Header Section -->
     <div class="sidebar-header">
       <Icon icon="mdi:account-circle" class="avatar-icon" />
       <div v-if="!collapsed" class="admin-info">
@@ -10,6 +12,7 @@
       </div>
     </div>
 
+    <!-- Menu Items -->
     <ul class="sidebar-menu">
       <li v-for="item in menuItems" :key="item.label">
         <router-link :to="item.route" active-class="active">
@@ -19,17 +22,17 @@
       </li>
     </ul>
 
-    <button class="collapse-toggle" @click="toggleSidebar">
-  <Icon
-    :icon="collapsed ? 'mdi:chevron-right' : 'mdi:chevron-left'"
-    class="menu-toggle-icon"
-  />
-</button>
+    <button @click="toggleSidebar"
+      class="collapse-toggle w-8 h-8 flex items-center justify-center text-blue-500 hover:text-blue-700 rounded-full bg-blue-100 hover:bg-blue-200 focus:outline-none"
+      title="Add">
+      <Icon :icon="collapsed ? 'mdi:chevron-right' : 'mdi:chevron-left'" class=" w-5 h-5" />
+    </button>
+
   </aside>
 </template>
 
 <script>
-import { Icon } from '@iconify/vue';
+import { Icon } from "@iconify/vue";
 
 export default {
   components: {
@@ -37,13 +40,13 @@ export default {
   },
   data() {
     return {
-      collapsed: false, 
+      collapsed: false,
       menuItems: [
-        { label: 'Locations', route: '/location', icon: 'mdi:map-marker' },
-        { label: 'Bins', route: '/bins', icon: 'mdi:trash-can' },
-        { label: 'Drivers', route: '/drivers', icon: 'mdi:account' },
-        { label: 'Vehicles', route: '/vehicles', icon: 'mdi:car' },
-        { label: 'Notifications', route: '/notifications', icon: 'mdi:bell' },
+        { label: "Dashboard", route: "/dashboard", icon: "mdi:view-dashboard" },
+        { label: "Locations", route: "/location", icon: "mdi:map-marker" },
+        { label: "Bins", route: "/bins", icon: "mdi:trash-can" },
+        { label: "Drivers", route: "/drivers", icon: "mdi:account" },
+        { label: "Vehicles", route: "/vehicles", icon: "mdi:car" },
       ],
     };
   },
@@ -55,7 +58,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+/* Sidebar */
 .sidebar {
   width: 250px;
   background-color: #1f2937;
@@ -67,11 +71,11 @@ export default {
   transition: width 0.3s ease;
   overflow: hidden;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  position: relative; 
+  position: relative;
 }
 
 .sidebar.collapsed {
-  width: 80px; 
+  width: 80px;
 }
 
 .sidebar-top-line {
@@ -79,7 +83,7 @@ export default {
   background-color: #4a90e2;
 }
 
-
+/* Header Section */
 .sidebar-header {
   display: flex;
   flex-direction: column;
@@ -145,14 +149,9 @@ export default {
   transition: opacity 0.3s ease;
 }
 
-.sidebar-menu li a:hover .menu-label {
-  opacity: 1;
-}
-
 .sidebar-menu li a.active,
 .sidebar-menu li a:hover {
   background-color: #2d3748;
-  border-left: 4px solid #4a90e2;
 }
 
 .sidebar.collapsed .menu-label {
@@ -164,7 +163,7 @@ export default {
   position: absolute;
   left: 80px;
   background-color: #1f2937;
-  padding: 5px 10px;
+  padding: 10px;
   border-radius: 5px;
   white-space: nowrap;
   z-index: 999;
@@ -172,31 +171,28 @@ export default {
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Collapse Toggle */
 .collapse-toggle {
   position: absolute;
-  top: 10px;
-  right: 4px; 
-  transform: translateX(50%); 
-  background: none;
+  bottom: 9%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4a90e2;
   border: none;
   color: #ffffff;
   font-size: 20px;
-  padding: 8px;
+  padding: 10px;
   cursor: pointer;
   text-align: center;
-}
-
-.collapse-toggle:hover {
-  color: #3447f0;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
 }
 
 .menu-toggle-icon {
   font-size: 24px;
-  background-color: #4a90e2;
-  padding: 1px 0;
-  border-radius: 40%;
 }
 
+/* Media Queries */
 @media (max-width: 768px) {
   .sidebar {
     position: fixed;

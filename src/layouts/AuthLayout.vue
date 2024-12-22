@@ -39,7 +39,8 @@ export default {
 .content-area {
   flex: 1;
   padding: 20px;
-  background-color: #F6F6F6;;
+  background-color: #F6F6F6;
+  ;
   overflow-y: auto;
 }
 </style>

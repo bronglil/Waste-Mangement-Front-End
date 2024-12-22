@@ -2,13 +2,14 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../views/LoginPage.vue';
 import Signup from '../views/SignupPage.vue';
-import Dashboard from '../views/DashboardPage.vue';
+import DashboardOverview from '../views/DashboardPage.vue';
 import store from '../store';
-import Settings from '../views/SettingsPage.vue';
 import AuthLayout from '../layouts/AuthLayout.vue';
 import LocationPage from '../views/LocationPage.vue';
 import DriversPage from '../views/DriversPage.vue';
 import BinPage from '../views/BinPage.vue';
+import VehiclesPage from '../views/VehiclesPage.vue';
+import SettingsPage from '../views/SettingsPage.vue';
 
 const routes = [
     {
@@ -36,19 +37,14 @@ const routes = [
         meta: { requiresAuth: false },
     },
     {
-        path: '/dashboard',
+        path: '/',
         component: AuthLayout,
         meta: { requiresAuth: false },
         children: [
             {
-                path: '',
+                path: '/dashboard',
                 name: 'Dashboard',
-                component: Dashboard,
-            },
-            {
-                path: 'settings',
-                name: 'Settings',
-                component: Settings,
+                component: DashboardOverview,
             },
             {
                 path: '/location',
@@ -63,17 +59,17 @@ const routes = [
             {
                 path: '/vehicles',
                 name: 'Vehicles',
-                component: DriversPage,
-            },
-            {
-                path: '/notifications',
-                name: 'Notifications',
-                component: DriversPage,
+                component: VehiclesPage,
             },
             {
                 path: '/bins',
                 name: 'Bins',
                 component: BinPage,
+            },
+            {
+                path: '/settings',
+                name: 'AccountSettings',
+                component: SettingsPage,
             },
         ],
     },
