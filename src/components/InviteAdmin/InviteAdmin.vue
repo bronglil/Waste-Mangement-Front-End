@@ -17,6 +17,26 @@
 
                 <!-- Form -->
                 <form @submit.prevent="handleSubmit" class="border-none m-2 p-2">
+                    <!-- First Name Input -->
+                    <div class="pb-4">
+                        <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
+                            First Name
+                        </label>
+                        <input type="text" id="firstName" v-model="adminData.firstName" required
+                            placeholder="Enter admin's first name" aria-label="Admin first name"
+                            class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
+                    </div>
+
+                    <!-- Last Name Input -->
+                    <div class="pb-4">
+                        <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">
+                            Last Name
+                        </label>
+                        <input type="text" id="lastName" v-model="adminData.lastName" required
+                            placeholder="Enter admin's last name" aria-label="Admin last name"
+                            class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
+                    </div>
+
                     <!-- Email Input -->
                     <div class="pb-4">
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
@@ -24,6 +44,16 @@
                         </label>
                         <input type="email" id="email" v-model="adminData.email" required
                             placeholder="Enter admin's email" aria-label="Admin email address"
+                            class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
+                    </div>
+
+                    <!-- Contact Input -->
+                    <div class="pb-4">
+                        <label for="contact" class="block text-sm font-medium text-gray-700 mb-2">
+                            Contact Number
+                        </label>
+                        <input type="text" id="contact" v-model="adminData.contact" required
+                            placeholder="Enter admin's contact number" aria-label="Admin contact number"
                             class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
                     </div>
 
@@ -64,7 +94,10 @@ export default {
     components: { Icon },
     setup() {
         const adminData = ref({
+            firstName: "",
+            lastName: "",
             email: "",
+            contact: "",
             role: "",
         });
 
@@ -72,14 +105,22 @@ export default {
         const loading = ref(false);
 
         const handleSubmit = async () => {
-            if (adminData.value.email && adminData.value.role) {
+            if (
+                adminData.value.firstName &&
+                adminData.value.lastName &&
+                adminData.value.email &&
+                adminData.value.contact &&
+                adminData.value.role
+            ) {
                 loading.value = true;
                 console.log("Sending Invitation:", adminData.value);
 
                 // Simulate an API call
                 setTimeout(() => {
-                    alert(`Invitation sent to ${adminData.value.email} as ${adminData.value.role}`);
-                    adminData.value = { email: "", role: "" }; // Reset the form
+                    alert(
+                        `Invitation sent to ${adminData.value.firstName} ${adminData.value.lastName} (${adminData.value.email}) as ${adminData.value.role}`
+                    );
+                    adminData.value = { firstName: "", lastName: "", email: "", contact: "", role: "" }; // Reset the form
                     loading.value = false;
                 }, 1000);
             } else {

@@ -37,12 +37,13 @@
                 <!-- Driver Name -->
                 <div class="mb-6">
                     <label for="driverName" class="flex block text-sm font-medium text-gray-700">
-                        Driver Name
+                        Assign Driver
                     </label>
-                    <select id="driverName" v-model="localData.driverName"
+                    <select id="driverName" v-model="localData.driverId"
                         class="w-full rounded-lg px-4 py-2 bg-white border border-gray-300 focus:ring focus:ring-blue-300 focus:border-blue-500 text-gray-800">
-                        <option v-for="driver in drivers" :key="driver.id" :value="driver.name">
-                            {{ driver.name }}
+                        <option value="" disabled>Select a driver</option>
+                        <option v-for="driver in drivers" :key="driver.id" :value="driver.id">
+                            {{ driver.firstName }} {{ driver.lastName }}
                         </option>
                     </select>
                 </div>
@@ -64,6 +65,8 @@
 </template>
 
 <script>
+import { fetchAvailableDriversApi } from '../../api/vehicles'; // Import the new API function
+
 export default {
     name: "VehicleModal",
     props: {
@@ -72,8 +75,8 @@ export default {
             default: () => ({
                 brand: "",
                 plateNumber: "",
-                driverName: "",
-            }), // Provide default values for adding a new vehicle
+                driverId: null,
+            }),
         },
         drivers: {
             type: Array,
@@ -82,12 +85,41 @@ export default {
     },
     data() {
         return {
-            localData: { ...this.vehicleData }, // Initialize form data with vehicleData
+            localData: { ...this.vehicleData },
+            isSubmitting: false,
+            drivers: [],
         };
     },
+    async created() {
+        await this.loadDrivers();
+    },
     methods: {
-        handleSubmit() {
-            this.$emit("submit", this.localData); // Emit updated or new data
+        async loadDrivers() {
+            try {
+                this.drivers = await fetchAvailableDriversApi();
+            } catch (error) {
+                console.error("Error loading drivers:", error);
+            }
+        },
+        async handleSubmit() {
+            if (this.isSubmitting) return;
+            this.isSubmitting = true;
+
+            const payload = {
+                vehicleBrand: this.localData.brand,
+                plateNumber: this.localData.plateNumber,
+                userId: this.localData.driverId
+            };
+
+            console.log("Payload being sent:", payload); // Log the payload
+
+            try {
+                this.$emit("submit", payload); // Emit the payload to the parent
+            } catch (error) {
+                console.error("Submission error:", error);
+            } finally {
+                this.isSubmitting = false; // Reset the flag after the API call
+            }
         },
     },
 };

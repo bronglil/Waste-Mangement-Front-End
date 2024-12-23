@@ -16,12 +16,12 @@ const routes = [
         path: '/',
         name: 'Home',
         beforeEnter: (to, from, next) => {
-            // const isAuthenticated = store.state.auth.token !== null;
-            // if (isAuthenticated) {
-            next('/dashboard');
-            // } else {
-            //     next('/login');
-            // }
+            const isAuthenticated = store.getters['auth/isAuthenticated'];
+            if (isAuthenticated) {
+                next('/dashboard');
+            } else {
+                next('/login');
+            }
         },
     },
     {
@@ -39,7 +39,7 @@ const routes = [
     {
         path: '/',
         component: AuthLayout,
-        meta: { requiresAuth: false },
+        meta: { requiresAuth: true },
         children: [
             {
                 path: '/dashboard',
@@ -73,7 +73,6 @@ const routes = [
             },
         ],
     },
-
 ];
 
 const router = createRouter({
@@ -83,11 +82,12 @@ const router = createRouter({
 
 // Global navigation guard
 router.beforeEach((to, from, next) => {
-    const isAuthenticated = store.state.auth.token !== null;
+    const isAuthenticated = store.getters['auth/isAuthenticated'];
+
     if (to.meta.requiresAuth && !isAuthenticated) {
-        next('/login');
-    } else if (!to.meta.requiresAuth && isAuthenticated) {
-        next('/dashboard');
+        next('/login'); // Redirect to login if accessing protected routes
+    } else if (to.path === '/login' && isAuthenticated) {
+        next('/dashboard'); // Redirect to dashboard if already logged in
     } else {
         next();
     }
