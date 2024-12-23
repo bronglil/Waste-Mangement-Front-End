@@ -48,9 +48,8 @@
         </div>
       </div>
 
-
-      <div class="flex w-1/2 mb-6">
-        <div class="w-full">
+      <div class="flex w-full gap-4 mb-6">
+        <div class="w-1/2">
           <label for="role" class="flex block text-sm font-medium text-gray-700 mb-2">
             Role
           </label>
@@ -61,6 +60,23 @@
               {{ role }}
             </option>
           </select>
+        </div>
+
+        <div class="w-1/2">
+          <div class="relative w-full mb-3">
+            <label class="flex items-center block text-gray-700 text-sm font-bold mb-2" for="password">
+              Password
+            </label>
+            <div class="relative">
+              <input id="password" :type="showPassword ? 'text' : 'password'" v-model="adminData.password"
+                class="border px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring focus:border-[#4a90e2] w-full"
+                placeholder="Password" />
+              <span class="absolute inset-y-0 right-4 flex items-center cursor-pointer text-gray-500"
+                @click="togglePassword">
+                <Icon :icon="showPassword ? 'mdi:eye-off' : 'mdi:eye'" class="text-lg" style="color: #4a90e2;" />
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -87,10 +103,16 @@ export default {
       email: "",
       contactNumber: "",
       role: "",
+      password: "", // Added password
     });
 
     const roles = ref(["Admin", "Editor", "Viewer"]);
     const loading = ref(false);
+    const showPassword = ref(false); // State for toggling password visibility
+
+    const togglePassword = () => {
+      showPassword.value = !showPassword.value;
+    };
 
     const handleSubmit = async () => {
       if (
@@ -98,10 +120,11 @@ export default {
         adminData.value.lastName &&
         adminData.value.email &&
         adminData.value.contactNumber &&
-        adminData.value.role
+        adminData.value.role &&
+        adminData.value.password
       ) {
         loading.value = true;
-        console.log("Sending Invitation:", JSON.stringify(adminData.value, null, 2)); // Log with JSON.stringify
+        console.log("Sending Admin Data:", JSON.stringify(adminData.value, null, 2)); // Log with JSON.stringify
 
         // Simulate an API call or other logic
         try {
@@ -117,8 +140,8 @@ export default {
           const result = await response.json();
 
           if (response.ok) {
-            alert(`Invitation sent successfully to ${adminData.value.firstName} ${adminData.value.lastName}`);
-            adminData.value = { firstName: "", lastName: "", email: "", contactNumber: "", role: "" }; // Reset form
+            alert(`Admin updated successfully.`);
+            adminData.value = { firstName: "", lastName: "", email: "", contactNumber: "", role: "", password: "" }; // Reset form
           } else {
             alert("Error: " + result.message || "Something went wrong!");
           }
@@ -137,11 +160,12 @@ export default {
       roles,
       handleSubmit,
       loading,
+      showPassword,
+      togglePassword,
     };
   },
 };
 </script>
-
 
 <style scoped>
 .card {
@@ -172,5 +196,9 @@ select option {
 select:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.relative input {
+  padding-right: 2.5rem;
 }
 </style>

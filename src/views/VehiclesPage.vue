@@ -44,7 +44,7 @@
             </template>
         </ReusableTable>
 
-        <!-- Vehicle Modal -->
+
         <VehicleModal v-if="showVehicleModal" :vehicleData="currentVehicle" :drivers="drivers"
             @submit="handleVehicleSubmit" @close="closeVehicleModal" />
     </div>
@@ -54,23 +54,42 @@
 import ReusableTable from "../components/ReusableTable/ReusableTable.vue";
 import VehicleModal from "../components/AddVehicleModal/VehicleModal.vue";
 import { Icon } from "@iconify/vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { fetchVehiclesApi, addVehicleApi, updateVehicleApi, deleteVehicleApi } from '../api/vehicles'; // Import the new API functions
 
 export default {
     components: { ReusableTable, VehicleModal, Icon },
     setup() {
-        const drivers = ref([
-            { id: 1, name: "Neil Sims" },
-            { id: 2, name: "Bonnie Green" },
-        ]);
-
-        const vehicles = ref([
-            { id: 1, brand: "Toyota", plateNumber: "ABC-123", driverName: "Neil Sims" },
-            { id: 2, brand: "Ford", plateNumber: "XYZ-789", driverName: "Bonnie Green" },
-        ]);
-
+        const drivers = ref([]); // Initialize drivers as an empty array
+        const vehicles = ref([]);
         const showVehicleModal = ref(false);
         const currentVehicle = ref(null);
+
+        // Fetch drivers from API (assuming you have an API for drivers)
+        const fetchDrivers = async () => {
+            // Implement the API call to fetch drivers
+            // Example: drivers.value = await fetchDriversApi();
+        };
+
+        // Fetch vehicles from API
+        const fetchVehicles = async () => {
+            try {
+                const response = await fetchVehiclesApi();
+                vehicles.value = response?.map(vehicle => ({
+                    id: vehicle.vehicleId,
+                    brand: vehicle.vehicleBrand,
+                    plateNumber: vehicle.plateNumber,
+                    driverName: vehicle.driver?.userId ? vehicle.driver?.firstName + ' ' + vehicle.driver?.lastName : 'Unassigned'
+                }));
+            } catch (error) {
+                console.error('Error fetching vehicles:', error);
+            }
+        };
+
+        onMounted(async () => {
+            await fetchDrivers(); // Fetch drivers when component mounts
+            await fetchVehicles(); // Fetch vehicles when component mounts
+        });
 
         const openAddVehicleModal = () => {
             currentVehicle.value = null; // Clear data for adding
@@ -86,24 +105,35 @@ export default {
             showVehicleModal.value = false;
         };
 
-        const handleVehicleSubmit = (vehicleData) => {
-            if (currentVehicle.value) {
-                // Edit existing vehicle
-                const index = vehicles.value.findIndex((v) => v.id === currentVehicle.value.id);
-                if (index !== -1) vehicles.value[index] = { ...currentVehicle.value, ...vehicleData };
-            } else {
-                // Add new vehicle
-                const newVehicle = {
-                    ...vehicleData,
-                    id: vehicles.value.length + 1, // Generate a new ID
-                };
-                vehicles.value.push(newVehicle);
+        const handleVehicleSubmit = async (payload) => {
+            if (payload instanceof Event) {
+                console.error("SubmitEvent detected unexpectedly:", payload);
+                return;
             }
-            closeVehicleModal();
+
+            console.log("Received payload in parent component:", payload);
+
+            try {
+                if (currentVehicle.value) {
+                    await updateVehicleApi(currentVehicle.value.id, payload);
+                } else {
+                    await addVehicleApi(payload);
+                }
+                await fetchVehicles(); // Refresh the vehicle list
+            } catch (error) {
+                console.error("Error while submitting vehicle data in parent:", error);
+            } finally {
+                closeVehicleModal();
+            }
         };
 
-        const deleteVehicle = (id) => {
-            vehicles.value = vehicles.value.filter((vehicle) => vehicle.id !== id);
+        const deleteVehicle = async (id) => {
+            try {
+                await deleteVehicleApi(id); // Call the delete API
+                await fetchVehicles(); // Refresh vehicle list after deletion
+            } catch (error) {
+                console.error('Error deleting vehicle:', error);
+            }
         };
 
         return {
