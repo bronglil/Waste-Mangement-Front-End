@@ -97,7 +97,12 @@ export default {
         };
 
         const openEditVehicleModal = (vehicle) => {
-            currentVehicle.value = { ...vehicle }; // Populate data for editing
+            currentVehicle.value = {
+                id: vehicle.id,
+                brand: vehicle.brand,
+                plateNumber: vehicle.plateNumber,
+                driverId: vehicle.driverId,
+            };
             showVehicleModal.value = true;
         };
 

@@ -38,6 +38,6 @@ export const deleteVehicleApi = async (id) => {
 };
 
 export const fetchAvailableDriversApi = async () => {
-    const { data } = await apiClient.get('/drivers/available-vehicles');
+    const { data } = await apiClient.get('/drivers/available-drivers');
     return data;
 }; 
