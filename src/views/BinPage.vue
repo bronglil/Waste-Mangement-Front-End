@@ -34,7 +34,8 @@
                     'bg-green-100 text-green-700': row.status === 'Empty',
                     'bg-yellow-100 text-yellow-700': row.status === 'In Progress',
                     'bg-red-100 text-red-700': row.status === 'Full',
-                }" class="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-full shadow-sm">
+                }"
+                    class="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-full shadow-sm">
                     {{ row.status }}
                 </div>
             </template>
@@ -65,11 +66,11 @@ import ReusableTable from "../components/ReusableTable/ReusableTable.vue";
 import EditBinModal from "../components/BinsModal/BinsModal.vue";
 import { Icon } from "@iconify/vue";
 import { ref, computed, onMounted } from "vue";
-import { 
-    fetchAllBinsApi, 
-    createBinApi, 
-    updateBinDataApi, 
-    deleteBinApi 
+import {
+    fetchAllBinsApi,
+    createBinApi,
+    updateBinDataApi,
+    deleteBinApi
 } from '../api/bins'; // Importing the API functions
 
 export default {
@@ -91,7 +92,7 @@ export default {
                 const fetchedBins = await fetchAllBinsApi(); // Fetch data from API
                 bins.value = fetchedBins.map(bin => ({
                     id: bin.id,
-                    location: `Location ${bin.id}`, // Adjust as necessary
+                    location: bin.locationName, // Adjust as necessary
                     lat: bin.latitude, // Map latitude
                     lng: bin.longitude, // Map longitude
                     status: bin.status === "FULL" ? "Full" : "Empty", // Map status accordingly

@@ -7,7 +7,7 @@
     <div class="sidebar-header">
       <Icon icon="mdi:account-circle" class="avatar-icon" />
       <div v-if="!collapsed" class="admin-info">
-        <span class="admin-name">Admin Name</span>
+        <span class="admin-name">{{ fullName || 'Admin Name' }}</span>
         <span class="admin-role">Super Admin</span>
       </div>
     </div>
@@ -33,10 +33,16 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+import { mapGetters } from 'vuex';
 
 export default {
   components: {
     Icon,
+  },
+  computed: {
+    ...mapGetters('auth', {
+      fullName: 'userFullName',
+    }),
   },
   data() {
     return {
