@@ -42,7 +42,7 @@
                     <select id="driverName" v-model="localData.driverId"
                         class="w-full rounded-lg px-4 py-2 bg-white border border-gray-300 focus:ring focus:ring-blue-300 focus:border-blue-500 text-gray-800">
                         <option value="" disabled>Select a driver</option>
-                        <option v-for="driver in drivers" :key="driver.id" :value="driver.id">
+                        <option v-for="driver in availableDrivers" :key="driver.id" :value="driver.id">
                             {{ driver.firstName }} {{ driver.lastName }}
                         </option>
                     </select>
@@ -63,74 +63,102 @@
         </div>
     </div>
 </template>
-
 <script>
-import { fetchAvailableDriversApi } from '../../api/vehicles'; // Import the new API function
+import { fetchAvailableDriversApi, fetchVehicleByIdApi } from "../../api/vehicles";
 
 export default {
     name: "VehicleModal",
     props: {
         vehicleData: {
             type: Object,
-            default: () => ({
-                brand: "",
-                plateNumber: "",
-                driverId: null,
-            }),
-        },
-        drivers: {
-            type: Array,
-            required: true,
+            required: false,
+            default: () => ({ id: null }),
         },
     },
     data() {
         return {
-            localData: { ...this.vehicleData },
+            localData: {
+                brand: "",
+                plateNumber: "",
+                driverId: null,
+            },
             isSubmitting: false,
-            drivers: [],
+            availableDrivers: [],
+            isEdit: false,
         };
     },
     async created() {
+        if (this.vehicleData?.id) {
+            this.isEdit = true;
+            await this.loadVehicleDetails();
+        } else {
+            this.isEdit = false;
+        }
         await this.loadDrivers();
     },
     methods: {
+        async loadVehicleDetails() {
+            try {
+                const vehicleDetails = await fetchVehicleByIdApi(this.vehicleData.id);
+                this.localData = {
+                    brand: vehicleDetails?.vehicleBrand || "",
+                    plateNumber: vehicleDetails?.plateNumber || "",
+                    driverId: vehicleDetails?.driver?.userId || null,
+                };
+
+                if (vehicleDetails.driver) {
+                    this.availableDrivers = [
+                        {
+                            id: vehicleDetails.driver.userId,
+                            firstName: vehicleDetails.driver.firstName,
+                            lastName: vehicleDetails.driver.lastName,
+                        },
+                    ];
+                }
+            } catch (error) {
+                console.error("Error loading vehicle details:", error);
+            }
+        },
+
+        // Fetch available drivers
         async loadDrivers() {
             try {
-                this.drivers = await fetchAvailableDriversApi();
+                const fetchedDrivers = await fetchAvailableDriversApi();
+
+                if (this.isEdit && this.localData.driverId) {
+                    this.availableDrivers = [
+                        ...this.availableDrivers,
+                        ...fetchedDrivers.filter(
+                            (driver) => driver.id !== this.localData.driverId
+                        ),
+                    ];
+                } else {
+                    this.availableDrivers = fetchedDrivers;
+                }
             } catch (error) {
                 console.error("Error loading drivers:", error);
             }
         },
+
         async handleSubmit() {
             if (this.isSubmitting) return;
-            this.isSubmitting = true;
 
+            this.isSubmitting = true;
             const payload = {
                 vehicleBrand: this.localData.brand,
                 plateNumber: this.localData.plateNumber,
-                userId: this.localData.driverId || null
+                userId: this.localData.driverId || null,
             };
 
-            console.log("Payload being sent:", payload); // Log the payload
-
             try {
-                this.$emit("submit", payload); // Emit the payload to the parent
+                this.$emit("submit", payload);
             } catch (error) {
-                console.error("Submission error:", error);
+                console.error("Error submitting vehicle data:", error);
             } finally {
-                this.isSubmitting = false; // Reset the flag after the API call
+                this.isSubmitting = false;
             }
         },
     },
+
 };
 </script>
-
-<style scoped>
-button {
-    transition: transform 0.2s ease-in-out, background 0.3s ease;
-}
-
-button:hover {
-    transform: scale(1.05);
-}
-</style>

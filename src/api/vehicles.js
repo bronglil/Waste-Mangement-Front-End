@@ -1,11 +1,4 @@
-import axios from 'axios';
-
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+import apiClient from './http'; // Import the configured Axios instance
 
 export const fetchVehiclesApi = async () => {
     const { data } = await apiClient.get('/vehicles');
