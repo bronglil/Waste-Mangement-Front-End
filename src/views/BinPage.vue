@@ -15,10 +15,18 @@
             </div>
         </div>
 
-        <ReusableTable :headers="['Location', 'Status', 'Actions']" :data="filteredBins"
-            :fields="['location', 'status', 'actions']">
+        <ReusableTable :headers="['Location', 'Latitude', 'Longitude', 'Status', 'Actions']" :data="filteredBins"
+            :fields="['location', 'lat', 'lng', 'status', 'actions']">
             <template #location="{ value }">
                 <div class="text-base font-medium text-gray-900 dark:text-white">{{ value }}</div>
+            </template>
+
+            <template #lat="{ row }">
+                <div class="text-base text-gray-900 dark:text-white">{{ row.lat }}</div>
+            </template>
+
+            <template #lng="{ row }">
+                <div class="text-base text-gray-900 dark:text-white">{{ row.lng }}</div>
             </template>
 
             <template #status="{ row }">
@@ -56,21 +64,42 @@
 import ReusableTable from "../components/ReusableTable/ReusableTable.vue";
 import EditBinModal from "../components/BinsModal/BinsModal.vue";
 import { Icon } from "@iconify/vue";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { 
+    fetchAllBinsApi, 
+    createBinApi, 
+    updateBinDataApi, 
+    deleteBinApi 
+} from '../api/bins'; // Importing the API functions
 
 export default {
     components: { ReusableTable, EditBinModal, Icon },
     setup() {
-        const bins = ref([
-            { id: 1, location: "Sector A - Block 3", status: "Full" },
-            { id: 2, location: "Sector B - Park Side", status: "Empty" },
-            { id: 3, location: "Sector C - Main Road", status: "In Progress" },
-        ]);
-
+        const bins = ref([]);
         const showEditBinModal = ref(false);
         const currentBin = ref(null);
 
         const filteredBins = computed(() => bins.value);
+
+        // Fetch bins when the component is mounted
+        onMounted(async () => {
+            await loadBins(); // Load bins from API
+        });
+
+        const loadBins = async () => {
+            try {
+                const fetchedBins = await fetchAllBinsApi(); // Fetch data from API
+                bins.value = fetchedBins.map(bin => ({
+                    id: bin.id,
+                    location: `Location ${bin.id}`, // Adjust as necessary
+                    lat: bin.latitude, // Map latitude
+                    lng: bin.longitude, // Map longitude
+                    status: bin.status === "FULL" ? "Full" : "Empty", // Map status accordingly
+                }));
+            } catch (error) {
+                console.error("Error fetching bins:", error);
+            }
+        };
 
         const openAddBinModal = () => {
             currentBin.value = null; // Clear data for adding a new bin
@@ -86,25 +115,34 @@ export default {
             showEditBinModal.value = false;
         };
 
-        const saveBinChanges = (updatedData) => {
+        const saveBinChanges = async (updatedData) => {
             if (currentBin.value) {
                 // Update existing bin
-                const binIndex = bins.value.findIndex((bin) => bin.id === currentBin.value.id);
-                if (binIndex !== -1) {
-                    bins.value[binIndex] = { ...currentBin.value, ...updatedData };
+                try {
+                    await updateBinDataApi(currentBin.value.id, updatedData);
+                    await loadBins(); // Reload bins after update
+                } catch (error) {
+                    console.error("Error updating bin:", error);
                 }
             } else {
                 // Add new bin
-                bins.value.push({
-                    ...updatedData,
-                    id: bins.value.length + 1, // Generate unique ID
-                });
+                try {
+                    await createBinApi(updatedData);
+                    await loadBins(); // Reload bins after creation
+                } catch (error) {
+                    console.error("Error creating bin:", error);
+                }
             }
             closeEditBinModal();
         };
 
-        const deleteBin = (id) => {
-            bins.value = bins.value.filter((bin) => bin.id !== id);
+        const deleteBin = async (id) => {
+            try {
+                await deleteBinApi(id);
+                await loadBins(); // Reload bins after deletion
+            } catch (error) {
+                console.error("Error deleting bin:", error);
+            }
         };
 
         return {
