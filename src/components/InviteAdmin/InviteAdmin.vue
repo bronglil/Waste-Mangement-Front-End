@@ -65,8 +65,8 @@
                         <select id="role" v-model="adminData.role" required aria-label="Admin role selection"
                             class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400">
                             <option value="" disabled>Select a role</option>
-                            <option v-for="role in roles" :key="role" :value="role">
-                                {{ role }}
+                            <option v-for="role in roleOptions" :key="role.value" :value="role.value">
+                                {{ role.label }}
                             </option>
                         </select>
                     </div>
@@ -89,6 +89,8 @@
 <script>
 import { ref } from "vue";
 import { Icon } from "@iconify/vue";
+import { sendAdminInviteApi } from '../../api/admins';
+import { ROLE_OPTIONS } from '../../global/constant';
 
 export default {
     components: { Icon },
@@ -98,10 +100,9 @@ export default {
             lastName: "",
             email: "",
             contact: "",
-            role: "",
+            role: "", // Keep role for selection
         });
 
-        const roles = ref(["Admin", "Editor", "Viewer"]);
         const loading = ref(false);
 
         const handleSubmit = async () => {
@@ -115,14 +116,17 @@ export default {
                 loading.value = true;
                 console.log("Sending Invitation:", adminData.value);
 
-                // Simulate an API call
-                setTimeout(() => {
-                    alert(
-                        `Invitation sent to ${adminData.value.firstName} ${adminData.value.lastName} (${adminData.value.email}) as ${adminData.value.role}`
-                    );
+                try {
+                    // Use the new API function to send the admin invite
+                    await sendAdminInviteApi(adminData.value);
+                    alert(`Invitation sent to ${adminData.value.firstName} ${adminData.value.lastName} (${adminData.value.email}) as ${adminData.value.role}`);
                     adminData.value = { firstName: "", lastName: "", email: "", contact: "", role: "" }; // Reset the form
+                } catch (error) {
+                    console.error("Error sending invitation:", error);
+                    alert("Failed to send invitation. Please try again.");
+                } finally {
                     loading.value = false;
-                }, 1000);
+                }
             } else {
                 alert("Please fill out all fields.");
             }
@@ -130,9 +134,9 @@ export default {
 
         return {
             adminData,
-            roles,
             handleSubmit,
             loading,
+            roleOptions: ROLE_OPTIONS, // Expose role options to the template
         };
     },
 };

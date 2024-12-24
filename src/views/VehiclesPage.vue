@@ -45,8 +45,8 @@
         </ReusableTable>
 
 
-        <VehicleModal v-if="showVehicleModal" :vehicleData="currentVehicle" :drivers="drivers"
-            @submit="handleVehicleSubmit" @close="closeVehicleModal" />
+        <VehicleModal v-if="showVehicleModal" :vehicleData="currentVehicle" @submit="handleVehicleSubmit"
+            @close="closeVehicleModal" />
     </div>
 </template>
 
@@ -60,16 +60,10 @@ import { fetchVehiclesApi, addVehicleApi, updateVehicleApi, deleteVehicleApi } f
 export default {
     components: { ReusableTable, VehicleModal, Icon },
     setup() {
-        const drivers = ref([]); // Initialize drivers as an empty array
         const vehicles = ref([]);
         const showVehicleModal = ref(false);
         const currentVehicle = ref(null);
 
-        // Fetch drivers from API (assuming you have an API for drivers)
-        const fetchDrivers = async () => {
-            // Implement the API call to fetch drivers
-            // Example: drivers.value = await fetchDriversApi();
-        };
 
         // Fetch vehicles from API
         const fetchVehicles = async () => {
@@ -87,22 +81,17 @@ export default {
         };
 
         onMounted(async () => {
-            await fetchDrivers(); // Fetch drivers when component mounts
-            await fetchVehicles(); // Fetch vehicles when component mounts
+            await fetchVehicles();
         });
 
         const openAddVehicleModal = () => {
-            currentVehicle.value = null; // Clear data for adding
+            currentVehicle.value = null;
             showVehicleModal.value = true;
         };
 
         const openEditVehicleModal = (vehicle) => {
-            currentVehicle.value = {
-                id: vehicle.id,
-                brand: vehicle.brand,
-                plateNumber: vehicle.plateNumber,
-                driverId: vehicle.driverId,
-            };
+            console.log(vehicle, "vehicle")
+            currentVehicle.value = { id: vehicle.id };
             showVehicleModal.value = true;
         };
 
@@ -134,15 +123,14 @@ export default {
 
         const deleteVehicle = async (id) => {
             try {
-                await deleteVehicleApi(id); // Call the delete API
-                await fetchVehicles(); // Refresh vehicle list after deletion
+                await deleteVehicleApi(id);
+                await fetchVehicles();
             } catch (error) {
                 console.error('Error deleting vehicle:', error);
             }
         };
 
         return {
-            drivers,
             vehicles,
             showVehicleModal,
             currentVehicle,

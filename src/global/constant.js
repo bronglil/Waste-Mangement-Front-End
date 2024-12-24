@@ -10,6 +10,11 @@ export const STATUS_OPTIONS = [
     { value: "Pending", label: "Pending" },
 ];
 
+// New constant for role options
+export const ROLE_OPTIONS = [
+    { value: "Admin", label: "Admin" },
+    { value: "Driver", label: "Driver" },
+];
 
 export default BIN_STATUS_OPTIONS;
 

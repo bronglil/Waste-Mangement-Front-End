@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen p-6 card">
+    <CustomAlert v-if="alertVisible" :message="alertMessage" :alertType="alertType" @close="alertVisible = false" />
     <div class="flex items-center justify-between w-full mx-auto p-2 bg-white shadow-md rounded-md border-b m-4">
       <div class="flex items-center space-x-2">
         <Icon :icon="'mdi:user-settings'" class="w-6 h-6 text-gray-800 dark:text-gray-600" />
@@ -56,27 +57,10 @@
           <select id="role" v-model="adminData.role" required
             class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400">
             <option disabled value="">Select Role</option>
-            <option v-for="role in roles" :key="role" :value="role">
-              {{ role }}
+            <option v-for="role in roles" :key="role.value" :value="role.value">
+              {{ role.label.toLowerCase() }}
             </option>
           </select>
-        </div>
-
-        <div class="w-1/2">
-          <div class="relative w-full mb-3">
-            <label class="flex items-center block text-gray-700 text-sm font-bold mb-2" for="password">
-              Password
-            </label>
-            <div class="relative">
-              <input id="password" :type="showPassword ? 'text' : 'password'" v-model="adminData.password"
-                class="border px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring focus:border-[#4a90e2] w-full"
-                placeholder="Password" />
-              <span class="absolute inset-y-0 right-4 flex items-center cursor-pointer text-gray-500"
-                @click="togglePassword">
-                <Icon :icon="showPassword ? 'mdi:eye-off' : 'mdi:eye'" class="text-lg" style="color: #4a90e2;" />
-              </span>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -91,11 +75,14 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { Icon } from "@iconify/vue";
+import { fetchAdminDataApi, updateAdminDataApi } from '../api/admins';
+import { ROLE_OPTIONS } from '../global/constant';
+import CustomAlert from '../components/CustomAlert.vue';
 
 export default {
-  components: { Icon },
+  components: { Icon, CustomAlert },
   setup() {
     const adminData = ref({
       firstName: "",
@@ -103,16 +90,43 @@ export default {
       email: "",
       contactNumber: "",
       role: "",
-      password: "", // Added password
     });
 
-    const roles = ref(["Admin", "Editor", "Viewer"]);
+    const roles = ref(ROLE_OPTIONS);
     const loading = ref(false);
-    const showPassword = ref(false); // State for toggling password visibility
+    const alertVisible = ref(false);
+    const alertMessage = ref("");
+    const alertType = ref("error");
 
-    const togglePassword = () => {
-      showPassword.value = !showPassword.value;
+    const fetchAdminData = async () => {
+      const User = JSON.parse(localStorage.getItem("auth_user"));
+      if (User?.userId) {
+        try {
+          const data = await fetchAdminDataApi(User?.userId);
+          console.log("Fetched Admin Data:", data);
+
+          adminData.value = {
+            firstName: data.firstName || "",
+            lastName: data.lastName || "",
+            email: data.email || "",
+            contactNumber: data.contactNumber || "",
+            role: data.role ? data.role.toLowerCase() : "",
+          };
+
+          const roleValue = adminData.value.role;
+          if (!ROLE_OPTIONS.some(role => role.value === roleValue)) {
+            console.warn("Role not found in ROLE_OPTIONS:", roleValue);
+          }
+        } catch (error) {
+          console.error("Error fetching admin data:", error);
+          showAlert("Error fetching admin data.", "error");
+        }
+      }
     };
+
+    onMounted(() => {
+      fetchAdminData();
+    });
 
     const handleSubmit = async () => {
       if (
@@ -120,39 +134,30 @@ export default {
         adminData.value.lastName &&
         adminData.value.email &&
         adminData.value.contactNumber &&
-        adminData.value.role &&
-        adminData.value.password
+        adminData.value.role
       ) {
         loading.value = true;
-        console.log("Sending Admin Data:", JSON.stringify(adminData.value, null, 2)); // Log with JSON.stringify
+        console.log("Sending Admin Data:", JSON.stringify(adminData.value, null, 2));
 
-        // Simulate an API call or other logic
         try {
-          // Replace this with an actual API call
-          const response = await fetch("https://your-api-endpoint.com", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(adminData.value),
-          });
-
-          const result = await response.json();
-
-          if (response.ok) {
-            alert(`Admin updated successfully.`);
-            adminData.value = { firstName: "", lastName: "", email: "", contactNumber: "", role: "", password: "" }; // Reset form
-          } else {
-            alert("Error: " + result.message || "Something went wrong!");
-          }
+          const user = JSON.parse(localStorage.getItem("auth_user"));
+          await updateAdminDataApi(user?.userId, adminData.value);
+          showAlert("Admin updated successfully.", "success");
+          adminData.value = { firstName: "", lastName: "", email: "", contactNumber: "", role: "" };
         } catch (error) {
-          alert("Network Error: " + error.message);
+          showAlert("Error updating admin data.", "error");
         }
 
         loading.value = false;
       } else {
-        alert("Please fill out all fields.");
+        showAlert("Please fill out all fields.", "error");
       }
+    };
+
+    const showAlert = (message, type) => {
+      alertMessage.value = message;
+      alertType.value = type;
+      alertVisible.value = true;
     };
 
     return {
@@ -160,8 +165,9 @@ export default {
       roles,
       handleSubmit,
       loading,
-      showPassword,
-      togglePassword,
+      alertVisible,
+      alertMessage,
+      alertType,
     };
   },
 };

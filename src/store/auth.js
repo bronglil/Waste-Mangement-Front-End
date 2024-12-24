@@ -19,6 +19,7 @@ export default {
         userFullName: (state) => (state.user ? `${state.user.firstName} ${state.user.lastName}` : null),
         userRole: (state) => state.user?.userRole || null,
         userEmail: (state) => state.user?.email || null,
+        userId: (state) => state.user?.userId || null,
     },
     mutations: {
         SET_TOKEN(state, token) {
