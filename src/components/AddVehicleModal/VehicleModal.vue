@@ -108,7 +108,7 @@ export default {
             const payload = {
                 vehicleBrand: this.localData.brand,
                 plateNumber: this.localData.plateNumber,
-                userId: this.localData.driverId
+                userId: this.localData.driverId || null
             };
 
             console.log("Payload being sent:", payload); // Log the payload
