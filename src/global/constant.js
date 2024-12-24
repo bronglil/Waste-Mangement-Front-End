@@ -1,7 +1,6 @@
 export const BIN_STATUS_OPTIONS = [
-    { value: "Full", label: "Full" },
-    { value: "Empty", label: "Empty" },
-    { value: "In Progress", label: "In Progress" },
+    { value: "FULL", label: "Full" },
+    { value: "EMPTY", label: "Empty" },
 ];
 
 export const STATUS_OPTIONS = [
@@ -12,8 +11,8 @@ export const STATUS_OPTIONS = [
 
 // New constant for role options
 export const ROLE_OPTIONS = [
-    { value: "Admin", label: "Admin" },
-    { value: "Driver", label: "Driver" },
+    { value: "ADMIN", label: "Admin" },
+    { value: "DRIVER", label: "Driver" },
 ];
 
 export default BIN_STATUS_OPTIONS;
