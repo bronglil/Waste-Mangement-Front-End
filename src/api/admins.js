@@ -34,13 +34,14 @@ export const fetchAdminDataApi = async (id) => {
     }
 };
 
-// Function to update admin data by ID
+
+// Existing function to update admin data by ID (if needed)
 export const updateAdminDataApi = async (id, adminData) => {
     if (!id || !adminData) {
         throw new Error("ID and admin data are required.");
     }
     try {
-        const { data } = await apiClient.post(`/drivers/${id}`, {
+        const { data } = await apiClient.put(`/drivers/${id}`, {
             firstName: adminData.firstName,
             lastName: adminData.lastName,
             contactNumber: adminData.contactNumber,

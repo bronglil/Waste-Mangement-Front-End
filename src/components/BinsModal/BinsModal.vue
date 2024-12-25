@@ -18,9 +18,9 @@
             <form @submit.prevent="handleSubmit" class="m-2 p-2 border-none">
                 <!-- Location -->
                 <div class="mb-6">
-                    <label for="location" class="flex block pb-4 text-sm font-medium text-gray-700">Location</label>
-                    <input type="text" id="location" v-model="localData.location" @input="fetchLocationSuggestions"
-                        placeholder="Enter location"
+                    <label for="locationName" class="flex block pb-4 text-sm font-medium text-gray-700">Location</label>
+                    <input type="text" id="locationName" v-model="localData.locationName"
+                        @input="fetchLocationSuggestions" placeholder="Enter location"
                         class="w-full rounded-lg px-4 py-2 focus:ring focus:ring-blue-200 focus:border-blue-400 text-gray-800 border border-gray-300" />
                     <!-- Dropdown for suggestions -->
                     <ul v-if="locationSuggestions.length"
@@ -70,21 +70,16 @@ export default {
         initialData: {
             type: Object,
             default: () => ({
-                location: "",
                 status: "",
             }),
         },
     },
     data() {
         return {
-            localData: { 
+            localData: {
                 ...this.initialData,
                 id: null,
                 lastUpdated: null,
-                latitude: 0,
-                locationName: null,
-                longitude: 0,
-                sensorData: null,
             },
             statusOptions: BIN_STATUS_OPTIONS || [],
             locationSuggestions: [],
@@ -109,19 +104,19 @@ export default {
         handleSubmit() {
             const dataToSend = {
                 id: this.localData.id,
-                lastUpdated: this.localData.lastUpdated,
+                lastUpdated: new Date(),
                 latitude: this.localData.latitude,
                 longitude: this.localData.longitude,
-                location: this.localData.location,
+                locationName: this.localData.locationName,
                 status: this.localData.status,
             };
-            
+
             this.$emit("save", dataToSend); // Emit the new object
         },
         async fetchLocationSuggestions() {
-            if (this.localData.location.length > 2) {
+            if (this.localData.locationName.length > 2) {
                 try {
-                    const response = await getLocations({ location: this.localData.location });
+                    const response = await getLocations({ location: this.localData.locationName });
                     this.locationSuggestions = response; // Assuming the API returns an array of suggestions
                 } catch (error) {
                     console.error("Error fetching location suggestions:", error);
@@ -131,18 +126,10 @@ export default {
             }
         },
         selectLocation(suggestion) {
-            this.localData.location = suggestion.address?.city || suggestion.name;
+            this.localData.id = suggestion.id;
+            this.localData.locationName = suggestion.address?.city || suggestion.name;
             this.localData.latitude = suggestion.lat;
             this.localData.longitude = suggestion.lon;
-            this.localData.locationName = suggestion.name;
-
-            // Log the selected values for testing
-            console.log("Selected Location:", {
-                name: this.localData.location,
-                lat: this.localData.latitude,
-                lng: this.localData.longitude,
-            });
-
             this.locationSuggestions = [];
         },
     },

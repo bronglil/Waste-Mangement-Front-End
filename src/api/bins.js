@@ -20,7 +20,8 @@ export const updateBinDataApi = async (id, binData) => {
         throw new Error("ID and bin data are required.");
     }
     try {
-        const { data } = await apiClient.put(`/bins/${id}`, binData);
+        console.log("Updating bin data:", { id: id, ...binData });
+        const { data } = await apiClient.put(`/bins/${id}`, { id: id, ...binData });
         return data;
     } catch (error) {
         console.error("Error updating bin data:", error.response ? error.response.data : error.message);

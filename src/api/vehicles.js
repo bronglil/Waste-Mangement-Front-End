@@ -6,10 +6,8 @@ export const fetchVehiclesApi = async () => {
 };
 
 export const addVehicleApi = async (vehicleData) => {
-    if (!vehicleData.brand || !vehicleData.plateNumber) {
-        throw new Error("Brand and plate number are required.");
-    }
     try {
+        console.log("Adding vehicle data:", vehicleData);
         const { data } = await apiClient.post('/vehicles', vehicleData);
         return data;
     } catch (error) {
@@ -19,9 +17,6 @@ export const addVehicleApi = async (vehicleData) => {
 };
 
 export const updateVehicleApi = async (id, vehicleData) => {
-    if (!id || !vehicleData) {
-        throw new Error("ID and vehicle data are required.");
-    }
     const { data } = await apiClient.put(`/vehicles/${id}`, vehicleData);
     return data;
 };

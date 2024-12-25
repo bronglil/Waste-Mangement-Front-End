@@ -98,6 +98,16 @@ export default {
     const alertMessage = ref("");
     const alertType = ref("error");
 
+    const user = JSON.parse(localStorage.getItem("auth_user"));
+
+    if (user) {
+      adminData.value.firstName = user.firstName || "";
+      adminData.value.lastName = user.lastName || "";
+      adminData.value.email = user.email || "";
+      adminData.value.contactNumber = user.contactNumber || "";
+      adminData.value.role = user.role ? user.role.toLowerCase() : "";
+    }
+
     const fetchAdminData = async () => {
       const User = JSON.parse(localStorage.getItem("auth_user"));
       if (User?.userId) {
@@ -141,7 +151,10 @@ export default {
 
         try {
           const user = JSON.parse(localStorage.getItem("auth_user"));
-          await updateAdminDataApi(user?.userId, adminData.value);
+          await updateAdminDataApi(user?.userId, {
+            ...adminData.value,
+            role: adminData.value.role
+          });
           showAlert("Admin updated successfully.", "success");
           adminData.value = { firstName: "", lastName: "", email: "", contactNumber: "", role: "" };
         } catch (error) {
