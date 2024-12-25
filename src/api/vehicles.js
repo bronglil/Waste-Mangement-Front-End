@@ -7,6 +7,7 @@ export const fetchVehiclesApi = async () => {
 
 export const addVehicleApi = async (vehicleData) => {
     try {
+        console.log("Adding vehicle data:", vehicleData);
         const { data } = await apiClient.post('/vehicles', vehicleData);
         return data;
     } catch (error) {

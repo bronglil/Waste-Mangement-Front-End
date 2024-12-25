@@ -18,9 +18,19 @@
             <form @submit.prevent="handleSubmit" class="m-2 p-2 border-none">
                 <!-- Location -->
                 <div class="mb-6">
-                    <label for="location" class="flex block pb-4 text-sm font-medium text-gray-700">Location</label>
-                    <input type="text" id="location" v-model="localData.location" placeholder="Enter location"
+                    <label for="locationName" class="flex block pb-4 text-sm font-medium text-gray-700">Location</label>
+                    <input type="text" id="locationName" v-model="localData.locationName"
+                        @input="fetchLocationSuggestions" placeholder="Enter location"
                         class="w-full rounded-lg px-4 py-2 focus:ring focus:ring-blue-200 focus:border-blue-400 text-gray-800 border border-gray-300" />
+                    <!-- Dropdown for suggestions -->
+                    <ul v-if="locationSuggestions.length"
+                        class="absolute bg-white border border-gray-300 rounded-lg mt-1 w-64 max-w-full shadow-lg z-10">
+                        <li v-for="suggestion in locationSuggestions" :key="suggestion.id"
+                            @click="selectLocation(suggestion)"
+                            class="px-4 py-2 hover:bg-blue-100 cursor-pointer transition duration-200 ease-in-out">
+                            {{ suggestion.name }}
+                        </li>
+                    </ul>
                 </div>
 
                 <!-- Status -->
@@ -53,21 +63,26 @@
 
 <script>
 import BIN_STATUS_OPTIONS from "../../global/constant";
+import { getLocations } from '../../api/bins'; // Import getLocations from bins.js
 
 export default {
     props: {
         initialData: {
             type: Object,
             default: () => ({
-                location: "",
                 status: "",
             }),
         },
     },
     data() {
         return {
-            localData: { ...this.initialData },
+            localData: {
+                ...this.initialData,
+                id: null,
+                lastUpdated: null,
+            },
             statusOptions: BIN_STATUS_OPTIONS || [],
+            locationSuggestions: [],
         };
     },
     computed: {
@@ -87,8 +102,53 @@ export default {
     },
     methods: {
         handleSubmit() {
-            this.$emit("save", this.localData);
+            const dataToSend = {
+                id: this.localData.id,
+                lastUpdated: new Date(),
+                latitude: this.localData.latitude,
+                longitude: this.localData.longitude,
+                locationName: this.localData.locationName,
+                status: this.localData.status,
+            };
+
+            this.$emit("save", dataToSend); // Emit the new object
+        },
+        async fetchLocationSuggestions() {
+            if (this.localData.locationName.length > 2) {
+                try {
+                    const response = await getLocations({ location: this.localData.locationName });
+                    this.locationSuggestions = response; // Assuming the API returns an array of suggestions
+                } catch (error) {
+                    console.error("Error fetching location suggestions:", error);
+                }
+            } else {
+                this.locationSuggestions = [];
+            }
+        },
+        selectLocation(suggestion) {
+            this.localData.id = suggestion.id;
+            this.localData.locationName = suggestion.address?.city || suggestion.name;
+            this.localData.latitude = suggestion.lat;
+            this.localData.longitude = suggestion.lon;
+            this.locationSuggestions = [];
         },
     },
 };
 </script>
+
+<style scoped>
+ul {
+    max-height: 200px;
+    overflow-y: auto;
+    width: 90%;
+    min-width: 200px;
+}
+
+li {
+    transition: background-color 0.2s ease;
+}
+
+li:hover {
+    background-color: #e0f7fa;
+}
+</style>

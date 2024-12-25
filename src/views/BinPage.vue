@@ -16,17 +16,17 @@
         </div>
 
         <ReusableTable :headers="['Location', 'Latitude', 'Longitude', 'Status', 'Actions']" :data="filteredBins"
-            :fields="['location', 'lat', 'lng', 'status', 'actions']">
-            <template #location="{ value }">
-                <div class="text-base font-medium text-gray-900 dark:text-white">{{ value }}</div>
+            :fields="['locationName', 'latitude', 'longitude', 'status', 'actions']">
+            <template #locationName="{ row }">
+                <div class="text-base font-medium text-gray-900 dark:text-white">{{ row.locationName }}</div>
             </template>
 
-            <template #lat="{ row }">
-                <div class="text-base text-gray-900 dark:text-white">{{ row.lat }}</div>
+            <template #latitude="{ row }">
+                <div class="text-base text-gray-900 dark:text-white">{{ row.latitude }}</div>
             </template>
 
-            <template #lng="{ row }">
-                <div class="text-base text-gray-900 dark:text-white">{{ row.lng }}</div>
+            <template #longitude="{ row }">
+                <div class="text-base text-gray-900 dark:text-white">{{ row.longitude }}</div>
             </template>
 
             <template #status="{ row }">
@@ -34,7 +34,8 @@
                     'bg-green-100 text-green-700': row.status === 'Empty',
                     'bg-yellow-100 text-yellow-700': row.status === 'In Progress',
                     'bg-red-100 text-red-700': row.status === 'Full',
-                }" class="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-full shadow-sm">
+                }"
+                    class="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-full shadow-sm">
                     {{ row.status }}
                 </div>
             </template>
@@ -65,12 +66,12 @@ import ReusableTable from "../components/ReusableTable/ReusableTable.vue";
 import EditBinModal from "../components/BinsModal/BinsModal.vue";
 import { Icon } from "@iconify/vue";
 import { ref, computed, onMounted } from "vue";
-import { 
-    fetchAllBinsApi, 
-    createBinApi, 
-    updateBinDataApi, 
-    deleteBinApi 
-} from '../api/bins'; // Importing the API functions
+import {
+    fetchAllBinsApi,
+    createBinApi,
+    updateBinDataApi,
+    deleteBinApi
+} from '../api/bins';
 
 export default {
     components: { ReusableTable, EditBinModal, Icon },
@@ -81,20 +82,19 @@ export default {
 
         const filteredBins = computed(() => bins.value);
 
-        // Fetch bins when the component is mounted
         onMounted(async () => {
-            await loadBins(); // Load bins from API
+            await loadBins();
         });
 
         const loadBins = async () => {
             try {
-                const fetchedBins = await fetchAllBinsApi(); // Fetch data from API
+                const fetchedBins = await fetchAllBinsApi();
                 bins.value = fetchedBins.map(bin => ({
                     id: bin.id,
-                    location: `Location ${bin.id}`, // Adjust as necessary
-                    lat: bin.latitude, // Map latitude
-                    lng: bin.longitude, // Map longitude
-                    status: bin.status === "FULL" ? "Full" : "Empty", // Map status accordingly
+                    locationName: bin.locationName,
+                    latitude: bin.latitude,
+                    longitude: bin.longitude,
+                    status: bin.status
                 }));
             } catch (error) {
                 console.error("Error fetching bins:", error);
@@ -107,7 +107,7 @@ export default {
         };
 
         const openEditBinModal = (bin) => {
-            currentBin.value = { ...bin }; // Populate data for editing
+            currentBin.value = { ...bin }; // Ensure the bin object includes the id
             showEditBinModal.value = true;
         };
 
@@ -119,7 +119,11 @@ export default {
             if (currentBin.value) {
                 // Update existing bin
                 try {
-                    await updateBinDataApi(currentBin.value.id, updatedData);
+                    await updateBinDataApi(currentBin.value.id, {
+                        ...currentBin.value,
+                        locationName: updatedData.locationName,
+                        ...updatedData, // Merge existing data with updated data
+                    });
                     await loadBins(); // Reload bins after update
                 } catch (error) {
                     console.error("Error updating bin:", error);
@@ -127,7 +131,10 @@ export default {
             } else {
                 // Add new bin
                 try {
-                    await createBinApi(updatedData);
+                    await createBinApi({
+                        ...updatedData, // Ensure updatedData contains all necessary fields
+                        locationName: updatedData.locationName, // Map location to locationName if needed
+                    });
                     await loadBins(); // Reload bins after creation
                 } catch (error) {
                     console.error("Error creating bin:", error);

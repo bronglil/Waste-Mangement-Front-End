@@ -5,24 +5,28 @@
       <ul class="bin-list">
         <li v-for="bin in bins" :key="bin.id" class="bin-item" @click="handleMarkerClick(bin)"
           :class="{ active: selectedBin?.id === bin.id }">
-          <CircularProgress :percentage="bin.level" />
+
+          <CircularProgress :status="bin.status" />
           <div class="bin-info">
-            <h3>{{ bin.name }}</h3>
-            <p>{{ bin.description }}</p>
+            <h3>{{ bin.locationName }}</h3>
+            <p>Last updated: {{ formatDateTime(bin.lastUpdated) }}</p>
           </div>
         </li>
       </ul>
     </div>
 
     <div class="map-container">
-      <MapComponent :bins="bins" @marker-click="handleMarkerClick" />
+      <MapComponent v-if="bins && bins.length > 0" :bins="bins" @marker-click="handleMarkerClick"
+        :centeredBin="selectedBin" />
+      <div v-else class="loading-message">Loading bins data...</div>
     </div>
   </div>
 </template>
 
 <script>
-import MapComponent from "@/components/Map/MapComponent.vue";
-import CircularProgress from "@/components/CircularProgress/CircularProgress.vue";
+import MapComponent from "../components/Map/MapComponent.vue";
+import CircularProgress from "../components/CircularProgress/CircularProgress.vue";
+import { fetchAllBinsApi } from "@/api/bins";
 
 export default {
   components: {
@@ -31,46 +35,27 @@ export default {
   },
   data() {
     return {
-      bins: [
-        {
-          id: 1,
-          name: "Bin 1",
-          lat: 48.8566,
-          lng: 2.3522,
-          description: "Located near Eiffel Tower.",
-          level: 90,
-        },
-        {
-          id: 2,
-          name: "Bin 2",
-          lat: 48.858844,
-          lng: 2.294351,
-          description: "Located near Champs-Élysées.",
-          level: 60,
-        },
-        {
-          id: 3,
-          name: "Bin 3",
-          lat: 48.860611,
-          lng: 2.337644,
-          description: "Located near Louvre Museum.",
-          level: 30,
-        },
-        {
-          id: 4,
-          name: "Bin 4",
-          lat: 48.804865,
-          lng: 2.120355,
-          description: "Located near Palace of Versailles.",
-          level: 50,
-        },
-      ],
+      bins: [],
       selectedBin: null,
     };
+  },
+  async mounted() {
+    try {
+      const response = await fetchAllBinsApi();
+      this.bins = response;
+    } catch (error) {
+      console.error("Error fetching bins data:", error);
+    }
   },
   methods: {
     handleMarkerClick(bin) {
       this.selectedBin = bin;
+      this.$emit("center-map", bin); // Emit the event to center the map
+    },
+    formatDateTime(dateString) {
+      if (!dateString) return "N/A";
+      const options = { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true };
+      return new Date(dateString).toLocaleString(undefined, options);
     },
   },
 };

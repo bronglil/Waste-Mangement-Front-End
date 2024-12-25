@@ -2,6 +2,10 @@ import apiClient from './http'; // Import the configured Axios instance
 
 // Function to send an admin invite
 export const sendAdminInviteApi = async (adminData) => {
+    // Validate adminData before sending
+    if (!adminData.firstName || !adminData.lastName || !adminData.contact || !adminData.email || !adminData.role) {
+        throw new Error("All fields are required.");
+    }
     try {
         const { data } = await apiClient.post('/drivers', {
             firstName: adminData.firstName,
@@ -18,6 +22,9 @@ export const sendAdminInviteApi = async (adminData) => {
 };
 
 export const fetchAdminDataApi = async (id) => {
+    if (!id) {
+        throw new Error("Admin ID is required.");
+    }
     try {
         const { data } = await apiClient.get(`/drivers/${id}`);
         return data;
@@ -27,10 +34,14 @@ export const fetchAdminDataApi = async (id) => {
     }
 };
 
-// Function to update admin data by ID
+
+// Existing function to update admin data by ID (if needed)
 export const updateAdminDataApi = async (id, adminData) => {
+    if (!id || !adminData) {
+        throw new Error("ID and admin data are required.");
+    }
     try {
-        const { data } = await apiClient.post(`/drivers/${id}`, {
+        const { data } = await apiClient.put(`/drivers/${id}`, {
             firstName: adminData.firstName,
             lastName: adminData.lastName,
             contactNumber: adminData.contactNumber,
