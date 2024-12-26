@@ -31,9 +31,10 @@
 
             <template #status="{ row }">
                 <div :class="{
-                    'bg-green-100 text-green-700': row.status === 'Empty',
-                    'bg-yellow-100 text-yellow-700': row.status === 'In Progress',
-                    'bg-red-100 text-red-700': row.status === 'Full',
+
+                    'bg-green-100 text-green-700': row.status <=15,
+                    'bg-yellow-100 text-yellow-700': row.status <=80,
+                    'bg-red-100 text-red-700': row.status >80,
                 }"
                     class="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-full shadow-sm">
                     {{ row.status }}
@@ -95,6 +96,7 @@ export default {
                     latitude: bin.latitude,
                     longitude: bin.longitude,
                     status: bin.status
+
                 }));
             } catch (error) {
                 console.error("Error fetching bins:", error);
