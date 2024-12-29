@@ -39,12 +39,13 @@
 
                 <div class="mb-6">
                     <label for="status" class="flex block pb-4 text-sm font-medium text-gray-700">Status</label>
-                    <select id="status" v-model="localData.status"
-                        class="w-full rounded-lg px-4 py-2 bg-white border border-gray-300 focus:ring focus:ring-blue-300 focus:border-blue-500 text-gray-800 transition duration-150 ease-in-out hover:bg-gray-50">
-                        <option v-for="option in extendedStatusOptions" :key="option.value" :value="option.value">
-                            {{ option.label }}
-                        </option>
-                    </select>
+                    <input
+                        type="number"
+                        id="status"
+                        placeholder="Enter the current satus of bin"
+                        v-model.number="localData.status" 
+                        class="w-full rounded-lg px-4 py-2 bg-white border border-gray-300 focus:ring focus:ring-blue-300 focus:border-blue-500 text-gray-800">
+                                    
                 </div>
 
                 <div class="flex justify-end space-x-4 border-t border-gray-200 pt-4">
@@ -92,14 +93,14 @@ function debounce(func, delay) {
 }
 
 export default {
-    props: {
-        initialData: {
-            type: Object,
-            default: () => ({
-                status: "",
-            }),
-        },
-    },
+    // props: {
+    //     initialData: {
+    //         type: Object,
+    //         default: () => ({
+    //             status: "",
+    //         }),
+    //     },
+    // },
     data() {
         return {
             localData: {
@@ -107,7 +108,7 @@ export default {
                 id: null,
                 lastUpdated: null,
             },
-            statusOptions: BIN_STATUS_OPTIONS || [],
+            statusOptions: BIN_STATUS_OPTIONS,
             locationSuggestions: [],
             debouncedFetchLocationSuggestions: null, // To hold the debounced function
         };
@@ -116,21 +117,21 @@ export default {
         // Initialize the debounced function
         this.debouncedFetchLocationSuggestions = debounce(this.fetchLocationSuggestions, 300);
     },
-    computed: {
-        extendedStatusOptions() {
-            const currentStatus = this.localData.status;
-            const isStatusInOptions = this.statusOptions.some((option) => option.value === currentStatus);
+    // computed: {
+    //     extendedStatusOptions() {
+    //         const currentStatus = this.localData.status;
+    //         const isStatusInOptions = this.statusOptions.some((option) => option.value === currentStatus);
 
-            if (isStatusInOptions || !currentStatus) {
-                return this.statusOptions;
-            }
+    //         if (isStatusInOptions || !currentStatus) {
+    //             return this.statusOptions;
+    //         }
 
-            return [
-                { value: currentStatus, label: currentStatus },
-                ...this.statusOptions,
-            ];
-        },
-    },
+    //         return [
+    //             { value: currentStatus, label: currentStatus },
+    //             ...this.statusOptions,
+    //         ];
+    //     },
+    // },
     methods: {
         handleSubmit() {
             const dataToSend = {

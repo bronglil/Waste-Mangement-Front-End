@@ -42,7 +42,16 @@ export default {
   async mounted() {
     try {
       const response = await fetchAllBinsApi();
-      this.bins = response;
+      // Map the status to "empty", "full", or "intermediate"
+      this.bins = response.map((bin) => ({
+        ...bin,
+        status:
+          bin.status > 85
+            ? "Full"
+            : bin.status < 20
+            ? "EMPTY"
+            : "MIDDLE",
+      }));
     } catch (error) {
       console.error("Error fetching bins data:", error);
     }
@@ -50,16 +59,25 @@ export default {
   methods: {
     handleMarkerClick(bin) {
       this.selectedBin = bin;
-      this.$emit("center-map", bin); // Emit the event to center the map
+      this.$emit("center-map", bin);
     },
     formatDateTime(dateString) {
       if (!dateString) return "N/A";
-      const options = { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true };
+      const options = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      };
       return new Date(dateString).toLocaleString(undefined, options);
     },
   },
 };
 </script>
+
 
 <style scoped>
 .location-page {
