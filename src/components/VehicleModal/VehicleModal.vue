@@ -16,7 +16,7 @@
             :key="index"
             class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-100"
           >
-            <span class="text-sm font-medium text-gray-800 truncate">{{ vehicle }}</span>
+            <span class="text-sm font-medium text-gray-800 truncate">{{ vehicle.vehicleBrand }} </span>
             <button
               @click="$emit('assign', vehicle)"
               class="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-full hover:from-blue-600 hover:to-blue-700 focus:outline-none shadow-md w-[100px] justify-center"

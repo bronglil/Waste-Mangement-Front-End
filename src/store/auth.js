@@ -38,14 +38,19 @@ export default {
         },
     },
     actions: {
-        async login({ commit }, { credentials, source }) {
+        async login({ commit, state }, { credentials, source }) {
             console.log(`Login called from: ${source}`);
             try {
                 const response = await loginApi(credentials);
                 const { token, ...userDetails } = response; // Destructure token and user details
 
-                // Store the token and user in the Vuex state
-                commit('SET_TOKEN', token);
+                // Check if the retrieved token matches the locally stored token
+                if (state.token !== token) {
+                    // If not, update the token in the Vuex state and local storage
+                    commit('SET_TOKEN', token);
+                }
+
+                // Store the user details in the Vuex state
                 commit('SET_USER', userDetails);
 
                 return { token, user: userDetails };
