@@ -4,9 +4,9 @@ export const BIN_STATUS_OPTIONS = [
 ];
 
 export const STATUS_OPTIONS = [
-    { value: "Active", label: "Active" },
-    { value: "Inactive", label: "Inactive" },
-    { value: "Pending", label: "Pending" },
+    { value: 'ACTIVE', label: 'ACTIVE' },
+    { value: 'INACTIVE', label: 'INACTIVE' },
+    { value: "PENDING", label: "PENDING" },
 ];
 
 // New constant for role options

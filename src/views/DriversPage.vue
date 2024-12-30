@@ -7,7 +7,7 @@
       </div>
     </div>
 
-    <ReusableTable :headers="['Driver', 'Vehicle', 'Contact', 'Status', 'Actions']" :data="filteredDrivers"
+    <ReusableTable :headers="['Driver', 'Vehicle', 'Contact', 'Status', 'Actions']" :data="drivers"
       :fields="['name', 'vehicle', 'contact', 'status', 'actions']">
       <!-- Driver Name Slot -->
       <template #name="{ row, value }">
@@ -27,8 +27,8 @@
       <!-- Vehicle Slot -->
       <template #vehicle="{ row }">
         <div>
-          <template v-if="row.vehicle">
-            <span class="text-gray-700 dark:text-gray-300">{{ row.vehicle }}</span>
+          <template v-if="row.vehicle != null">
+            <span class="text-gray-700 dark:text-gray-300">{{ row.vehicle.plateNumber }}</span>
           </template>
           <template v-else>
             <button @click="openAssignVehicleModal(row)"
@@ -48,8 +48,16 @@
         </div>
       </template>
 
-      <!-- Status Slot -->
-      <template #status="{ row }">
+       <!-- Status Slot -->
+       <template #status="{ row }">
+
+<div>
+{{row.status}}
+
+</div>
+
+</template>
+      <!-- <template #status="{ row }">
         <div>
           <select v-model="row.status" @change="updateStatus(row)"
             class="px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring focus:ring-blue-300 dark:focus:ring-blue-600 w-40">
@@ -58,12 +66,12 @@
             </option>
           </select>
         </div>
-      </template>
+      </template> -->
 
       <!-- Actions Slot -->
       <template #actions="{ row }">
         <div class="flex space-x-2">
-          <button @click="openEditDriverModal(row)"
+          <button @click="openEditModal(row)"
             class="w-8 h-8 flex items-center justify-center text-blue-500 hover:text-blue-700 rounded-full bg-blue-100 hover:bg-blue-200 focus:outline-none"
             title="Edit">
             <Icon :icon="'mdi:pencil'" class="w-5 h-5" />
@@ -84,117 +92,179 @@
     <!-- Edit Driver Modal -->
     <AddDriverModal v-if="showEditDriverModal" :initial-data="currentDriver" @save="updateDriver"
       @close="closeEditDriverModal" />
+
+    <EditDriverModal
+      v-if="showEditModal"
+      :show="showEditModal"
+      :driver="selectedDriver"
+      @save="handleUpdateDriver"
+      @close="closeEditModal"
+    />
   </div>
 </template>
+
 
 <script>
 import ReusableTable from "../components/ReusableTable/ReusableTable.vue";
 import VehicleModal from "../components/VehicleModal/VehicleModal.vue";
 import AddDriverModal from "../components/AddDriverModal/AddDriverModal.vue";
-import { STATUS_OPTIONS } from "../global/constant";
+import EditDriverModal from '../components/EditDriverModal/EditDriverModal.vue';
 import { Icon } from "@iconify/vue";
-import { ref, computed } from "vue";
+import { ref, onMounted } from "vue";
+import { fetchDriversApi, UpdateDriverApi, DeleteDriverApi } from "../api/drivers";
+import { fetchVehiclesApi, updateVehicleApi } from "../api/vehicles";
+import { STATUS_OPTIONS } from "../global/constant";
 
 export default {
-  components: { ReusableTable, VehicleModal, AddDriverModal, Icon },
+  components: { ReusableTable, VehicleModal, AddDriverModal, Icon, EditDriverModal },
   setup() {
-    const drivers = ref([
-      {
-        id: 1,
-        name: "Neil Sims",
-        email: "neil.sims@example.com",
-        vehicle: "",
-        status: "Active",
-        image: "https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg",
-        contact: "+33745368512"
-      },
-      {
-        id: 2,
-        name: "Bonnie Green",
-        email: "bonnie.green@example.com",
-        vehicle: "Truck 2",
-        status: "Inactive",
-        image: "https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg",
-        contact: "+33745368512"
-      },
-    ]);
-
-    const availableVehicles = ref(["Truck 1", "Truck 3", "Truck 4"]);
+    const drivers = ref([]);
+    const availableVehicles = ref([]);
+    const showEditModal = ref(false);
+    const selectedDriver = ref(null);
     const showVehicleModal = ref(false);
-    const showEditDriverModal = ref(false);
-    const currentDriver = ref(null);
-    const searchQuery = ref("");
 
-    const filteredDrivers = computed(() =>
-      drivers.value.filter((driver) =>
-        driver.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
-    );
-
-    const assignVehicle = (vehicle) => {
-      if (currentDriver.value) {
-        currentDriver.value.vehicle = vehicle;
-        closeVehicleModal();
+    const fetchDrivers = async () => {
+      try {
+        const response = await fetchDriversApi();
+        drivers.value = response?.map(driver => ({
+          id: driver.userId,
+          name: driver.firstName + " " + driver.lastName,
+          email: driver.email,
+          status: driver.status,
+          image: "https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg",
+          contact: driver.contactNumber,
+          vehicle: driver.vehicle
+        }));
+        console.log('driver vehicle data', drivers.value[0].vehicle)
+      } catch (error) {
+        console.error("Error fetching drivers", error);
       }
+    };
+
+    const fetchAvailableVehicles = async () => {
+      try {
+        const response = await fetchVehiclesApi();
+        availableVehicles.value = response;
+      } catch (error) {
+        console.error("Error fetching vehicles", error);
+      }
+    };
+
+    onMounted(async () => {
+      await fetchDrivers();
+      await fetchAvailableVehicles();
+    });
+
+    const updateStatus = (row) => {
+      console.log(`Status updated for ${row.name}: ${row.status}`);
+      // Implement your backend update logic here
+    };
+
+    const openEditModal = (driver) => {
+      console.log("driver data to be updated", driver)
+      selectedDriver.value = { ...driver }; // Create a copy of driver data
+      showEditModal.value = true;
+    };
+
+    const closeEditModal = () => {
+      showEditModal.value = false;
+      selectedDriver.value = null;
+    };
+
+    const handleUpdateDriver = async (updatedDriver) => {
+      console.log('updated driver details', updatedDriver)
+      try {
+        // Call the API to update the driver
+        await UpdateDriverApi(updatedDriver.id, updatedDriver);
+
+        // Update local state
+        const index = drivers.value.findIndex(d => d.id === updatedDriver.id);
+        if (index !== -1) {
+          drivers.value[index] = { ...updatedDriver };
+        }
+        closeEditModal();
+      } catch (error) {
+        console.error('Error updating driver:', error);
+      }
+    };
+
+    const deleteDriver = async (driverId) => {
+      console.log('acessing delete function', driverId)
+      try {
+        // Call the API to delete the driver
+        await DeleteDriverApi(driverId);
+
+        // Remove the driver from the local state
+        drivers.value = drivers.value.filter(driver => driver.id !== driverId);
+        console.log('Driver deleted successfully');
+      } catch (error) {
+        console.error('Error deleting driver:', error);
+      }
+    };
+
+    const openAssignVehicleModal = (driver) => {
+      console.log('driver data', driver)
+      selectedDriver.value = driver;
+      showVehicleModal.value = true;
     };
 
     const closeVehicleModal = () => {
       showVehicleModal.value = false;
+      selectedDriver.value = null;
     };
 
-    const openAssignVehicleModal = (row) => {
-      currentDriver.value = row;
-      showVehicleModal.value = true;
-    };
+    const assignVehicle = async (vehicle) => {
+      console.log('accessing assign vehicle')
+      try {
+        // Update vehicle data with the driver's details
+        const updatedVehicleData = {
+          ...vehicle,
+          userId: selectedDriver.value.id,
+          driver: {
+            firstName: selectedDriver.value.name.split(" ")[0],
+            lastName: selectedDriver.value.name.split(" ")[1],
+            email: selectedDriver.value.email,
+            contactNumber: selectedDriver.value.contact,
+            userId: selectedDriver.value.id,
+          }
+        };
+        console.log('vehicle data', vehicle)
+        console.log('user data', selectedDriver)
 
-    const openEditDriverModal = (row) => {
-      currentDriver.value = { ...row };
-      showEditDriverModal.value = true;
-    };
+        // Call the API to update the vehicle
+        await updateVehicleApi(vehicle.vehicleId, updatedVehicleData);
+        console.log('vehicle assigned successfully')
 
-    const closeEditDriverModal = () => {
-      showEditDriverModal.value = false;
-    };
+        // Re-fetch drivers to update the UI with the latest data
+        await fetchDrivers();
 
-    const updateDriver = (updatedData) => {
-      const driverIndex = drivers.value.findIndex(
-        (driver) => driver.id === currentDriver.value.id
-      );
-      if (driverIndex !== -1) {
-        drivers.value[driverIndex] = { ...currentDriver.value, ...updatedData };
+        closeVehicleModal();
+      } catch (error) {
+        console.error("Error assigning vehicle", error);
       }
-      closeEditDriverModal();
-    };
-
-    const updateStatus = (row) => {
-      console.log(`Status updated to ${row.status} for driver ${row.name}`);
-    };
-
-    const deleteDriver = (id) => {
-      drivers.value = drivers.value.filter((driver) => driver.id !== id);
-      console.log(`Deleted driver with id: ${id}`);
     };
 
     return {
       drivers,
       availableVehicles,
-      searchQuery,
-      filteredDrivers,
-      showVehicleModal,
-      showEditDriverModal,
-      assignVehicle,
-      closeVehicleModal,
-      openAssignVehicleModal,
-      openEditDriverModal,
-      closeEditDriverModal,
-      updateDriver,
-      updateStatus,
-      deleteDriver,
       STATUS_OPTIONS,
+      updateStatus,
+      showEditModal,
+      selectedDriver,
+      openEditModal,
+      closeEditModal,
+      handleUpdateDriver,
+      deleteDriver,
+      showVehicleModal,
+      openAssignVehicleModal,
+      closeVehicleModal,
+      assignVehicle,
     };
   },
 };
 </script>
+
 
 <style scoped>
 .card {
@@ -214,18 +284,5 @@ button:focus {
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
 }
 
-select {
-  width: 10rem;
-  /* Set dropdown width */
-}
 
-select option {
-  padding: 0.25rem 0.5rem;
-  /* Compact option height */
-}
-
-select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
 </style>
