@@ -31,9 +31,9 @@
 
             <template #status="{ row }">
                 <div :class="{
-                    'bg-green-100 text-green-700': row.status === 'Empty',
-                    'bg-yellow-100 text-yellow-700': row.status === 'In Progress',
-                    'bg-red-100 text-red-700': row.status === 'Full',
+                    'bg-green-100 text-green-700': row.status <=15,
+                    'bg-yellow-100 text-yellow-700': row.status >15 && row.status <85,
+                    'bg-red-100 text-red-700': row.status >85,
                 }"
                     class="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-full shadow-sm">
                     {{ row.status }}

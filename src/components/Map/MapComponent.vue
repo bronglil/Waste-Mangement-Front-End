@@ -22,7 +22,7 @@ export default {
     // Method to create custom icons based on bin status
     getBinIcon(status) {
       console.log("Bin status:", status);
-      const fillColor = status.toLowerCase() === "full" ? "red" : "green";
+      const fillColor = status === "FULL" ? "red" : "green";
 
       const outerCircleStyles = `
         width: 70px;
@@ -98,8 +98,6 @@ export default {
       const lng = bin.longitude //|| this.defaultCoords[1];
 
       console.log({ lat, lng });
-      console.log('Latitude:', bin.latitude);
-      console.log('Longitude:', bin.longitude);
       console.log('Status:', bin.status);
 
       // console.log("Adding marker for bin:", bin); // Log each bin for debugging
