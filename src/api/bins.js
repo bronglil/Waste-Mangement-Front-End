@@ -51,6 +51,8 @@ export const fetchAllBinsApi = async () => {
     }
 };
 
+
+
 // Function to create a new bin
 export const createBinApi = async (binData) => {
     try {

@@ -54,3 +54,16 @@ export const updateAdminDataApi = async (id, adminData) => {
         throw error;
     }
 };
+
+// Function to fetch all bins
+export const fetchDashBoardDataApi = async () => {
+    try {
+        const { data } = await apiClient.get('/dashboard/metrics');
+        console.log(data)
+        console.log("hello")
+        return data;
+    } catch (error) {
+        console.error("Error fetching Dashboard Data:", error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
