@@ -40,6 +40,10 @@
                       </span>
                     </div>
                   </div>
+                  <!-- Error Message -->
+                  <div v-if="errorMessage" class="text-red-500 text-sm mb-3">
+                    {{ errorMessage }}
+                  </div>
                   <!-- Sign In Button -->
                   <div class="text-center mt-6">
                     <button
@@ -49,14 +53,9 @@
                     </button>
                   </div>
                 </form>
-                <div class="flex flex-wrap mt-6">
-                  <div class="w-1/2">
-                    <a href="#forgot-password" class="text-gray-400 hover:text-[#4a90e2] text-sm">
-                      Forgot password?
-                    </a>
-                  </div>
-                  <div class="w-1/2 text-right">
-                    <a href="/signup" class="text-gray-400 hover:text-[#4a90e2] text-sm">
+                <div class=" mt-6">
+                  <div class="text-center">
+                    <a href="/signup" class="text-gray-600 hover:text-[#4a90e2] text-sm">
                       Create new account
                     </a>
                   </div>
@@ -86,6 +85,7 @@ export default {
         password: "",
       },
       showPassword: false,
+      errorMessage: "",
     };
   },
   methods: {
@@ -97,7 +97,7 @@ export default {
         await this.login({ credentials: { email, password }, source: 'LoginPage' });
         this.$router.push("/dashboard")
       } catch (error) {
-        alert("Error: " + error.message);
+        this.errorMessage = error.message || "An error occurred during login.";
       }
     },
     togglePassword() {
