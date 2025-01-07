@@ -55,7 +55,7 @@ export default {
 
                 return { token, user: userDetails };
             } catch (error) {
-                throw new Error('Login failed: ' + error.message);
+                throw new Error('Login failed: Please check your credentials and try again.'); // Throw error with message
             }
         },
         logout({ commit }) {
