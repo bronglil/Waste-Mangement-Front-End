@@ -1,90 +1,118 @@
-# Waste Management Project
+# Waste Management System
 
-## Overview
-This project is a Vue.js application for waste management, utilizing various libraries and tools to enhance functionality.
+## 🚀 Overview
+The Waste Management System is a comprehensive solution designed to optimize waste collection and monitoring through real-time updates, driver navigation, and IoT-based bin monitoring. This modern application integrates multiple technologies to create an efficient and sustainable waste management process.
 
-## Table of Contents
-- [Prerequisites](#prerequisites)
-- [Cloning the Repository](#cloning-the-repository)
-- [Installing Dependencies](#installing-dependencies)
-- [Starting the Development Server](#starting-the-development-server)
-- [Building the Project](#building-the-project)
-- [Linting the Code](#linting-the-code)
-- [Dependencies](#dependencies)
-- [License](#license)
+## 🏗 System Architecture
+The system consists of four main components:
+- **Frontend**: Vue.js application providing an intuitive user interface
+- **Backend**: Spring Boot application managing business logic and APIs
+- **Mobile Application**: Android app built with Kotlin and Jetpack Compose
+- **IoT Integration**: Real-time bin monitoring system using IoT devices
 
-## Prerequisites
-Make sure you have the following installed on your machine:
-- [Node.js](https://nodejs.org/) (version 14 or higher)
-- [npm](https://www.npmjs.com/) (comes with Node.js)
+## ✨ Key Features
+- **Real-Time Monitoring**
+  - Live updates of bin statuses through IoT devices
+  - Instant synchronization across all platforms
+  - Dashboard visualization of system metrics
 
-## Cloning the Repository
-To clone the repository, open your terminal and run the following command:
+- **Smart Navigation**
+  - Interactive maps for bin locations
+  - Optimized route planning for drivers
+  - Turn-by-turn navigation system
 
+- **Driver Dashboard**
+  - Mobile-first interface for waste collectors
+  - Real-time route updates and bin status
+  - Collection confirmation system
+
+- **System Integration**
+  - Seamless communication between all components
+  - Centralized data management
+  - Automated status updates and notifications
+
+## 🛠 Prerequisites
+- **Frontend Requirements**
+  - Node.js (v16 or later)
+  - Yarn (v1.22 or later) or npm
+  
+- **Complete System Requirements**
+  - Java 11 or later (for Backend)
+  - Android Studio (for Mobile App)
+  - IoT device configuration tools
+
+## 📦 Installation
+
+1. **Clone the Repository**
 ```bash
 git clone https://github.com/bronglil/Waste-Mangement-Front-End.git
-Installing Dependencies
-Navigate to the project directory:
-
-bash
-
-Copy
 cd Waste-Mangement-Front-End
-Install the dependencies by running:
+```
 
-bash
+2. **Install Dependencies**
+```bash
+# Using Yarn
+yarn install
 
-Copy
+# Using npm
 npm install
-Starting the Development Server
-To start the development server, use the following command:
+```
 
-bash
+3. **Development Server**
+```bash
+# Using Yarn
+yarn serve
 
-Copy
+# Using npm
 npm run serve
-Open your browser and go to http://localhost:8080 to view the application.
+```
 
-Building the Project
-To build the project for production, run:
+4. **Production Build**
+```bash
+# Using Yarn
+yarn build
 
-bash
-
-Copy
+# Using npm
 npm run build
-The built files will be output to the dist directory.
+```
 
-Linting the Code
-To lint the code, use the following command:
+## 📚 Dependencies
 
-bash
+### Core Dependencies
+```json
+{
+  "@iconify/vue": "^4.1.2",
+  "axios": "^1.7.7",
+  "chart.js": "^4.4.7",
+  "core-js": "^3.8.3",
+  "leaflet": "^1.9.4",
+  "vue": "^3.2.13",
+  "vue-router": "^4.4.5",
+  "vuex": "^4.1.0"
+}
+```
 
-Copy
-npm run lint
-This will check your code for any linting errors based on the ESLint configuration defined in the project.
+### Development Dependencies
+```json
+{
+  "@babel/core": "^7.12.16",
+  "@vue/cli-plugin-babel": "~5.0.0",
+  "tailwindcss": "^3.4.15",
+  "postcss": "^8.4.49"
+}
+```
 
-Dependencies
-This project uses the following dependencies:
+## 🤝 Contributing
+We welcome contributions! Please follow these steps:
 
-@iconify/vue: ^4.1.2
-axios: ^1.7.7
-chart.js: ^4.4.7
-core-js: ^3.8.3
-leaflet: ^1.9.4
-vue: ^3.2.13
-vue-router: ^4.4.5
-vuex: ^4.1.0
-Development Dependencies
-@babel/core: ^7.12.16
-@babel/eslint-parser: ^7.12.16
-@vue/cli-plugin-babel: ~5.0.0
-@vue/cli-plugin-eslint: ~5.0.0
-@vue/cli-plugin-router: ~5.0.0
-@vue/cli-service: ~5.0.0
-autoprefixer: ^10.4.20
-eslint: ^7.32.0
-eslint-plugin-vue: ^8.0.3
-postcss: ^8.4.49
-tailwindcss: ^3.4.15
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔧 Configuration
+For detailed configuration options, please refer to the [Vue CLI Configuration Reference](https://cli.vuejs.org/config/).
