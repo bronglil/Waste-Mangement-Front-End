@@ -14,7 +14,6 @@
 
         <div v-if="isSettingsOpen" class="dropdown-menu">
           <button class="dropdown-item" @click="openAccountSettings">Account Settings</button>
-          <button class="dropdown-item" @click="openHelp">Help & Support</button>
           <button class="dropdown-item" @click="openInviteAdminModal">Invite Admin</button>
         </div>
       </div>

@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'https://waste-management-server.cleverapps.io/api',
+    // baseURL: 'https://waste-management-server.cleverapps.io/api',
+    baseURL: 'http://localhost:8080/api',
     headers: {
         'Content-Type': 'application/json',
     },

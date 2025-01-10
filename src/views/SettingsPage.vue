@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between w-full mx-auto p-2 bg-white shadow-md rounded-md border-b m-4">
       <div class="flex items-center space-x-2">
         <Icon :icon="'mdi:user-settings'" class="w-6 h-6 text-gray-800 dark:text-gray-600" />
-        <h4 class="text-md font-medium text-gray-800 dark:text-black">Settings</h4>
+        <h4 class="text-md font-medium text-gray-800 dark:text-black">ADMIN INFORMATION</h4>
       </div>
     </div>
 
@@ -15,7 +15,7 @@
             First Name
           </label>
           <input type="text" id="first_name" v-model="adminData.firstName" required
-            placeholder="Enter admin's First Name" aria-label="Admin First Name"
+            placeholder="Enter admin's First Name" aria-label="Admin First Name" readonly
             class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
         </div>
 
@@ -23,7 +23,7 @@
           <label for="last_name" class="flex block text-sm font-medium text-gray-700 mb-2">
             Last Name
           </label>
-          <input type="text" id="last_name" v-model="adminData.lastName" required placeholder="Enter admin's Last Name"
+          <input type="text" id="last_name" v-model="adminData.lastName" required placeholder="Enter admin's Last Name" readonly
             aria-label="Admin Last Name"
             class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
         </div>
@@ -34,7 +34,7 @@
           <label for="email" class="flex block text-sm font-medium text-gray-700 mb-2">
             Email
           </label>
-          <input type="email" id="email" v-model="adminData.email" required placeholder="Enter admin's Email"
+          <input type="email" id="email" v-model="adminData.email" required placeholder="Enter admin's Email" readonly
             aria-label="Admin Email"
             class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
         </div>
@@ -44,32 +44,11 @@
             Contact Number
           </label>
           <input type="text" id="contact_number" v-model="adminData.contactNumber" required
-            placeholder="Enter admin's Contact Number" aria-label="Admin Contact Number"
+            placeholder="Enter admin's Contact Number" aria-label="Admin Contact Number" readonly
             class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
         </div>
       </div>
 
-      <div class="flex w-full gap-4 mb-6">
-        <div class="w-1/2">
-          <label for="role" class="flex block text-sm font-medium text-gray-700 mb-2">
-            Role
-          </label>
-          <select id="role" v-model="adminData.role" required
-            class="w-full px-4 py-2 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400">
-            <option disabled value="">Select Role</option>
-            <option v-for="role in roles" :key="role.value" :value="role.value">
-              {{ role.label.toLowerCase() }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="flex justify-end">
-        <button @click="handleSubmit" :disabled="loading"
-          class="px-6 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
-          {{ loading ? "Updating..." : "Update Admin" }}
-        </button>
-      </div>
     </div>
   </div>
 </template>
@@ -78,7 +57,6 @@
 import { ref, onMounted } from "vue";
 import { Icon } from "@iconify/vue";
 import { fetchAdminDataApi, updateAdminDataApi } from '../api/admins';
-import { ROLE_OPTIONS } from '../global/constant';
 import CustomAlert from '../components/CustomAlert.vue';
 
 export default {
@@ -89,10 +67,11 @@ export default {
       lastName: "",
       email: "",
       contactNumber: "",
-      role: "",
+      password:"",
+      confirmPassword:""
     });
 
-    const roles = ref(ROLE_OPTIONS);
+  
     const loading = ref(false);
     const alertVisible = ref(false);
     const alertMessage = ref("");
@@ -105,7 +84,7 @@ export default {
       adminData.value.lastName = user.lastName || "";
       adminData.value.email = user.email || "";
       adminData.value.contactNumber = user.contactNumber || "";
-      adminData.value.role = user.role ? user.role.toLowerCase() : "";
+     
     }
 
     const fetchAdminData = async () => {
@@ -120,13 +99,10 @@ export default {
             lastName: data.lastName || "",
             email: data.email || "",
             contactNumber: data.contactNumber || "",
-            role: data.role ? data.role.toLowerCase() : "",
+            password: data.password || "",
           };
 
-          const roleValue = adminData.value.role;
-          if (!ROLE_OPTIONS.some(role => role.value === roleValue)) {
-            console.warn("Role not found in ROLE_OPTIONS:", roleValue);
-          }
+       
         } catch (error) {
           console.error("Error fetching admin data:", error);
           showAlert("Error fetching admin data.", "error");
@@ -144,7 +120,7 @@ export default {
         adminData.value.lastName &&
         adminData.value.email &&
         adminData.value.contactNumber &&
-        adminData.value.role
+        adminData.value.password
       ) {
         loading.value = true;
         console.log("Sending Admin Data:", JSON.stringify(adminData.value, null, 2));
@@ -152,11 +128,10 @@ export default {
         try {
           const user = JSON.parse(localStorage.getItem("auth_user"));
           await updateAdminDataApi(user?.userId, {
-            ...adminData.value,
-            role: adminData.value.role
+            ...adminData.value
           });
           showAlert("Admin updated successfully.", "success");
-          adminData.value = { firstName: "", lastName: "", email: "", contactNumber: "", role: "" };
+          adminData.value = { firstName: "", lastName: "", email: "", contactNumber: "" };
         } catch (error) {
           showAlert("Error updating admin data.", "error");
         }
@@ -175,7 +150,6 @@ export default {
 
     return {
       adminData,
-      roles,
       handleSubmit,
       loading,
       alertVisible,
