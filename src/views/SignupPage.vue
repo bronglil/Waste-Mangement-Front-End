@@ -36,6 +36,7 @@
                       class="border px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring focus:border-[#4a90e2] w-full"
                       placeholder="First Name"
                     />
+                    <div v-if="errors.firstName" class="text-red-500 text-xs mt-1">{{ errors.firstName }}</div>
                   </div>
                   <!-- Last Name -->
                   <div class="relative w-full mb-3">
@@ -52,6 +53,7 @@
                       class="border px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring focus:border-[#4a90e2] w-full"
                       placeholder="Last Name"
                     />
+                    <div v-if="errors.lastName" class="text-red-500 text-xs mt-1">{{ errors.lastName }}</div>
                   </div>
                   <!-- Phone -->
                   <div class="relative w-full mb-3">
@@ -68,6 +70,7 @@
                       class="border px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring focus:border-[#4a90e2] w-full"
                       placeholder="Phone"
                     />
+                    <div v-if="errors.phone" class="text-red-500 text-xs mt-1">{{ errors.phone }}</div>
                   </div>
                   <!-- Email -->
                   <div class="relative w-full mb-3">
@@ -84,6 +87,7 @@
                       class="border px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring focus:border-[#4a90e2] w-full"
                       placeholder="Email"
                     />
+                    <div v-if="errors.email" class="text-red-500 text-xs mt-1">{{ errors.email }}</div>
                   </div>
                   <!-- Password -->
                   <div class="relative w-full mb-3">
@@ -112,6 +116,7 @@
                         />
                       </span>
                     </div>
+                    <div v-if="errors.password" class="text-red-500 text-xs mt-1">{{ errors.password }}</div>
                   </div>
                   <!-- Submit Button -->
                   <div class="text-center mt-6">
@@ -158,17 +163,57 @@ export default {
         password: "",
       },
       showPassword: false,
+      errors: {},
     };
   },
   methods: {
     ...mapActions("auth", ["signup"]),
+    validateForm() {
+      this.errors = {};
+
+      if (!this.form.firstName) {
+        this.errors.firstName = "First Name is required.";
+      } else if (this.form.firstName.length < 2) {
+        this.errors.firstName = "First Name must be at least 2 characters.";
+      }
+
+      if (!this.form.lastName) {
+        this.errors.lastName = "Last Name is required.";
+      } else if (this.form.lastName.length < 2) {
+        this.errors.lastName = "Last Name must be at least 2 characters.";
+      }
+
+      const phonePattern = /^[0-9]{10}$/;
+      if (!this.form.phone) {
+        this.errors.phone = "Phone number is required.";
+      } else if (!phonePattern.test(this.form.phone)) {
+        this.errors.phone = "Phone number must be 10 digits.";
+      }
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!this.form.email) {
+        this.errors.email = "Email is required.";
+      } else if (!emailPattern.test(this.form.email)) {
+        this.errors.email = "Email is not valid.";
+      }
+
+      if (!this.form.password) {
+        this.errors.password = "Password is required.";
+      } else if (this.form.password.length < 6) {
+        this.errors.password = "Password must be at least 6 characters.";
+      }
+
+      return Object.keys(this.errors).length === 0;
+    },
     async handleSubmit() {
-      try {
-        const { firstName, lastName, phone, email, password } = this.form;
-        await this.signup({ firstName, lastName, phone, email, password });
-        this.$router.push("/dashboard");
-      } catch (error) {
-        alert("Error: " + error.message);
+      if (this.validateForm()) {
+        try {
+          const { firstName, lastName, phone, email, password } = this.form;
+          await this.signup({ firstName, lastName, phone, email, password });
+          this.$router.push("/dashboard");
+        } catch (error) {
+          alert("Error: " + error.message);
+        }
       }
     },
     togglePassword() {
