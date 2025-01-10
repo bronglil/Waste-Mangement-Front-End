@@ -45,7 +45,7 @@
                     {{ errorMessage }}
                   </div>
                   <!-- Sign In Button -->
-                  <div class="text-center mt-6">
+                  <div class="text-center mt-8">
                     <button
                       class="bg-[#4a90e2] text-white hover:bg-blue-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none w-full"
                       type="submit">
@@ -53,13 +53,6 @@
                     </button>
                   </div>
                 </form>
-                <div class=" mt-6">
-                  <div class="text-center">
-                    <a href="/signup" class="text-gray-600 hover:text-[#4a90e2] text-sm">
-                      Create new account
-                    </a>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

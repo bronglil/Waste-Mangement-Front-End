@@ -26,7 +26,7 @@ export const fetchAdminDataApi = async (id) => {
         throw new Error("Admin ID is required.");
     }
     try {
-        const { data } = await apiClient.get(`/drivers/${id}`);
+        const { data } = await apiClient.get(`/admin/ByID/${id}`);
         return data;
     } catch (error) {
         console.error("Error fetching admin data:", error.response ? error.response.data : error.message);
@@ -37,16 +37,17 @@ export const fetchAdminDataApi = async (id) => {
 
 // Existing function to update admin data by ID (if needed)
 export const updateAdminDataApi = async (id, adminData) => {
+    console.log('admin id', id)
+    console.log('admin data', adminData)
     if (!id || !adminData) {
         throw new Error("ID and admin data are required.");
     }
     try {
-        const { data } = await apiClient.put(`/drivers/${id}`, {
+        const { data } = await apiClient.put(`/admin/${id}`, {
             firstName: adminData.firstName,
             lastName: adminData.lastName,
             contactNumber: adminData.contactNumber,
             email: adminData.email,
-            userRole: adminData.role,
         });
         return data;
     } catch (error) {
